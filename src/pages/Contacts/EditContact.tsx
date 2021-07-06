@@ -203,39 +203,6 @@ const EditContactScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 								// }
 								/>
               }
-              {menuOption.title === 'Edit Name' &&
-								<TextInput
-								  style={{
-								    // flex: 1,
-								    borderRadius: 10,
-								    borderWidth: 1,
-								    borderColor: Colors.backgroundColor,
-								    height: 50,
-								    // margin: 20,
-								    paddingLeft: 15,
-								    paddingRight: 15,
-								    fontSize: RFValue( 11 ),
-								    fontFamily: Fonts.FiraSansMedium,
-								     marginTop: 15, marginBottom: hp( '1%' )
-								  }}
-								  placeholder={'Enter Names'}
-								  placeholderTextColor={Colors.borderColor}
-								  value={name}
-								  textContentType='none'
-								  autoCompleteType='off'
-								  autoCorrect={false}
-								  autoCapitalize="none"
-								  onKeyPress={event => {
-								    // setBackspace( event )
-								  }}
-								  onChangeText={( text ) => {
-								    setName( text )
-								  }}
-								// onSubmitEditing={
-								// 	(event) => (setConfirm(event.nativeEvent))
-								// }
-								/>
-              }
               {/* {menuOption.title === 'Edit Name' && errorText ?
 								<Text style={{ marginLeft: 'auto', color: Colors.red, fontSize: RFValue(10), fontFamily: Fonts.FiraSansMediumItalic, }}>{errorText}</Text> : null
 							} */}

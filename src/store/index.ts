@@ -114,6 +114,7 @@ import {
   walletCheckInWatcher,
   syncPermanentChannelsWatcher,
   initializeTrustedContactWatcher,
+  // editTrustedContactWatcher,
   rejectTrustedContactWatcher,
 } from './sagas/trustedContacts'
 
@@ -280,6 +281,7 @@ const rootSaga = function* () {
 
     // Trusted Contacts
     initializeTrustedContactWatcher,
+    editTrustedContactWatcher,
     rejectTrustedContactWatcher,
     removeTrustedContactWatcher,
     walletCheckInWatcher,

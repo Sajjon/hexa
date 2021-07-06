@@ -5,6 +5,7 @@ import {
   SYNC_PERMANENT_CHANNELS,
   syncPermanentChannels,
   INITIALIZE_TRUSTED_CONTACT,
+  // EDIT_TRUSTED_CONTACT,
   existingPermanentChannelsSynched,
   InitTrustedContactFlowKind,
   PermanentChannelsSyncKind,
@@ -355,6 +356,16 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     channelUpdates: [ channelUpdate ],
   } ) )
 }
+
+// function* editTrustedContactWorker( { payload } : {payload: {contact: any, flowKind: InitTrustedContactFlowKind, isKeeper?: boolean, channelKey?: string, contactsSecondaryChannelKey?: string, shareId?: string}} ) {
+//   console.log( contact )
+
+// }
+
+// export const editTrustedContactWatcher = createWatcher(
+//   editTrustedContactWorker,
+//   EDIT_TRUSTED_CONTACT,
+// )
 
 export const initializeTrustedContactWatcher = createWatcher(
   initializeTrustedContactWorker,

@@ -181,6 +181,8 @@ class FriendsAndFamilyScreen extends PureComponent<
   updateAddressBook = async () => {
     const { trustedContactsService } = this.props
     const contacts = trustedContactsService.tc.trustedContacts
+    // console.log( 'contacts >>>>>>>', contacts )
+
 
     const keepers = []
     const keeping = []
