@@ -277,7 +277,7 @@ const rootSaga = function* () {
 
     // Trusted Contacts
     initializeTrustedContactWatcher,
-    editTrustedContactWatcher,
+    // editTrustedContactWatcher,
     rejectTrustedContactWatcher,
     removeTrustedContactWatcher,
     walletCheckInWatcher,
