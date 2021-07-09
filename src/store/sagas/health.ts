@@ -101,6 +101,7 @@ import {
   Trusted_Contacts,
   UnecryptedStreamData,
   VersionHistory,
+  Wallet,
   WalletImage,
 } from '../../bitcoin/utilities/Interface'
 import LevelHealth from '../../bitcoin/utilities/LevelHealth/LevelHealth'
@@ -172,6 +173,7 @@ function* initHealthWorker() {
     levelInfo: levelInfo,
   } ], 0 ) )
   yield put( switchS3LoaderKeeper( 'initLoader' ) )
+  yield call( modifyLevelDataWorker )
 }
 
 export const initHealthWatcher = createWatcher(
@@ -184,21 +186,21 @@ function* generateMetaSharesWorker( { payload } ) {
   const { walletName } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP
   )
-  const secureAccount: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
   const appVersion = DeviceInfo.getVersion()
   const { level, SM, isUpgrade } = payload
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
-  const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
+  const wallet: Wallet = yield select(
+    ( state ) => state.storage.wallet
+  )
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
 
   const secureAssets = {
     secondaryMnemonic: secondaryMnemonic,
     twoFASecret: '',
     secondaryXpub: '',
-    bhXpub: secureAccount ? secureAccount.secureHDWallet.xpubs.bh : '',
+    bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
   }
 
   let serviceCall = null
@@ -1678,11 +1680,11 @@ function* generateSMMetaSharesWorker( { payload } ) {
   const { answer, questionId, question } = yield select(
     ( state ) => state.storage.database.WALLET_SETUP.security
   )
-  const secureAccount: SecureAccount = yield select(
-    ( state ) => state.accounts[ SECURE_ACCOUNT ].service,
-  )
 
-  const secondaryMnemonic = SM && SM ? SM : secureAccount.secureHDWallet.secondaryMnemonic ? secureAccount.secureHDWallet.secondaryMnemonic : ''
+  const wallet: Wallet = yield select(
+    ( state ) => state.storage.wallet
+  )
+  const secondaryMnemonic = SM && SM ? SM : wallet.secondaryMemonic ? wallet.secondaryMemonic : ''
   const res = yield call(
     s3Service.generateSMShares,
     secondaryMnemonic,
@@ -1974,7 +1976,9 @@ function* createChannelAssetsWorker( { payload } ) {
       yield put( switchS3LoaderKeeper( 'createChannelAssetsStatus' ) )
       const keeperInfo: KeeperInfoInterface[] = yield select( ( state ) => state.health.keeperInfo )
       const secondaryShareDownloadedVar = yield select( ( state ) => state.health.secondaryShareDownloaded )
-      const secureAccount: SecureAccount = yield select( ( state ) => state.accounts[ SECURE_ACCOUNT ].service )
+      const wallet: Wallet = yield select(
+        ( state ) => state.storage.wallet
+      )
       let secondaryShare: string = encryptedSecondaryShares && encryptedSecondaryShares.length &&  encryptedSecondaryShares[ 1 ] ? encryptedSecondaryShares[ 1 ] : ''
       if( secondaryShareDownloadedVar ) {
         secondaryShare = secondaryShareDownloadedVar
@@ -1990,7 +1994,7 @@ function* createChannelAssetsWorker( { payload } ) {
         },
         secondaryMnemonicShard: secondaryShare,
         keeperInfo: keeperInfo,
-        bhXpub: secureAccount ? secureAccount.secureHDWallet.xpubs.bh : '',
+        bhXpub: wallet.details2FA && wallet.details2FA.bithyveXpub ? wallet.details2FA.bithyveXpub : '',
         shareId
       }
       yield put( setChannelAssets( channelAssets ) )
@@ -2035,8 +2039,8 @@ function* downloadSMShareWorker( { payload } ) {
           retrieveSecondaryData: true,
         }, secondaryChannelKey: qrDataObj.secondaryChannelKey
       } )
-      if( res.data.secondaryData.secondaryMnemonicShard ) {
-        yield put( secondaryShareDownloaded( res.data.secondaryData.secondaryMnemonicShard ) )
+      if( res.secondaryData.secondaryMnemonicShard ) {
+        yield put( secondaryShareDownloaded( res.secondaryData.secondaryMnemonicShard ) )
         yield put( setApprovalStatus( true ) )
       }
     }

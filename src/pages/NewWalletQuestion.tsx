@@ -45,6 +45,7 @@ import ButtonBlue from '../components/ButtonBlue'
 import { updateCloudPermission } from '../store/actions/health'
 import CloudPermissionModalContents from '../components/CloudPermissionModalContents'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import CardWithRadioBtn from '../components/CardWithRadioBtn'
 import { setupWallet, walletSetupCompletion } from '../store/actions/setupAndAuth'
 
 export enum BottomSheetKind {
@@ -115,7 +116,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     'The Hexa wallet is non-custodial and is created locally on your phone so that you have full control of it',
   )
   const [ Elevation, setElevation ] = useState( 10 )
-  const [ height, setHeight ] = useState( 72 )
+  const [ height, setHeight ] = useState( 81 )
   const [ isLoaderStart, setIsLoaderStart ] = useState( false )
   const [ dropdownBoxOpenClose, setDropdownBoxOpenClose ] = useState( false )
   const [ dropdownBoxList ] = useState( QuestionList )
@@ -139,8 +140,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ pswd, setPswd ] = useState( '' )
   const [ pswdMasked, setPswdMasked ] = useState( '' )
   const [ confirmPswdMasked, setConfirmPswdMasked ] = useState( '' )
+  const [ hintMasked, setHintMasked ] = useState( '' )
   const [ hideShowConfirmAnswer, setHideShowConfirmAnswer ] = useState( true )
   const [ hideShowConfirmPswd, setHideShowConfirmPswd ] = useState( true )
+  const [ hideShowHint, setHideShowHint ] = useState( true )
   const [ hideShowAnswer, setHdeShowAnswer ] = useState( true )
   const [ hideShowPswd, setHideShowPswd ] = useState( true )
 
@@ -158,6 +161,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const [ loaderModal, setLoaderModal ] = useState( false )
   const [ confirmAnswerTextInput ] = useState( React.createRef() )
   const [ confirmPswdTextInput ] = useState( React.createRef() )
+  const [ hint ] = useState( React.createRef() )
+  const [ hintText, setHint ] = useState( '' )
   const [ visibleButton, setVisibleButton ] = useState( false )
   const [ showNote, setShowNote ] = useState( true )
   const [ securityQue, showSecurityQue ] = useState( false )
@@ -186,7 +191,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
     const keyboardDidHideListener = Keyboard.addListener(
       'keyboardDidHide',
       () => {
-        setHeight( 72 )
+        setHeight( 81 )
       }
     )
     dispatch( clearAccountSyncCache() )
@@ -272,6 +277,22 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
   const handlePswdSubmit = () => {
     setConfirmPswd( tempPswd )
 
+    if ( pswd && confirmPswd && confirmPswd != pswd ) {
+      setPswdError( 'Password do not match' )
+    } else if (
+      validateAllowedCharacters( pswd ) == false ||
+      validateAllowedCharacters( tempPswd ) == false
+    ) {
+      setPswdError( 'Password must only contain lowercase characters (a-z) and digits (0-9)' )
+    } else {
+      setTimeout( () => {
+        setPswdError( '' )
+      }, 2 )
+    }
+  }
+
+
+  const handleHintSubmit = () => {
     if ( pswd && confirmPswd && confirmPswd != pswd ) {
       setPswdError( 'Password do not match' )
     } else if (
@@ -429,8 +450,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
-          backgroundColor: Colors.white,
-          height: '72%'
+          backgroundColor: Colors.backgroundColor,
+          // height: `${height}%`
 
         }}
       >
@@ -439,7 +460,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}>
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false )}}
+            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false ); setPswdError( '' ); setHint( '' )}}
             style={{
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
               alignSelf: 'flex-end',
@@ -464,8 +485,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               flexDirection: 'row',
               alignItems: 'center',
               paddingRight: 15,
-              borderColor: answerError ? Colors.red : Colors.borderColor,
-              marginTop: 20
+              borderColor: pswdError ? Colors.red : Colors.borderColor,
+              marginTop: 10,
+              backgroundColor: Colors.white
             }}
           >
             <TextInput
@@ -536,7 +558,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               alignItems: 'center',
               paddingRight: 15,
               borderColor: pswdError ? Colors.red : Colors.borderColor,
-              marginVertical: 20
+              marginTop: 10,
+              backgroundColor: Colors.white
             }}
           >
             <TextInput
@@ -551,7 +574,10 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               autoCorrect={false}
               editable={isEditable}
               autoCapitalize="none"
-              onSubmitEditing={handlePswdSubmit}
+              onSubmitEditing={() => {
+                handlePswdSubmit();
+                ( hint as any ).current.focus()
+              }}
               keyboardType={
                 Platform.OS == 'ios'
                   ? 'ascii-capable'
@@ -589,7 +615,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             {tempPswd ? (
               <TouchableWithoutFeedback
                 onPress={() => {
-                  setHideShowConfirmPswd( !hideShowConfirmAnswer )
+                  setHideShowConfirmPswd( !hideShowConfirmPswd )
                   setDropdownBoxOpenClose( false )
                 }}
               >
@@ -604,12 +630,72 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               </TouchableWithoutFeedback>
             ) : null}
           </View>
-
           {pswdError.length == 0 && (
             <Text style={styles.helpText}>
-              No numbers or special characters allowed
+              {/* Password must only contain lowercase characters (a-z) and digits (0-9) */}
+              No number or special characters allowed
             </Text>
           )}
+          <View
+            style={{
+              ...answerInputStyle,
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingRight: 15,
+              borderColor: Colors.borderColor,
+              marginVertical: 10,
+              backgroundColor: Colors.white
+            }}
+          >
+            <TextInput
+              style={styles.modalInputBox}
+              ref={hint}
+              placeholder={'Add a hint'}
+              placeholderTextColor={Colors.borderColor}
+              value={hideShowHint ? hintMasked : hintText}
+              autoCompleteType="off"
+              textContentType="none"
+              returnKeyType="next"
+              autoCorrect={false}
+              editable={isEditable}
+              autoCapitalize="none"
+              keyboardType={
+                Platform.OS == 'ios'
+                  ? 'ascii-capable'
+                  : 'visible-password'
+              }
+              onChangeText={( text ) => {
+                setHint( text )
+                setHintMasked( text )
+                // setConfirmPswdMasked( text )
+              }}
+              onBlur={() => {
+                let temp = ''
+                for ( let i = 0; i < hintText.length; i++ ) {
+                  temp += '*'
+                }
+                setHintMasked( temp )
+              }}
+            />
+            {hintText ? (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setHideShowHint( !hideShowHint )
+
+                  // setDropdownBoxOpenClose( false )
+                }}
+              >
+                <Feather
+                  style={{
+                    marginLeft: 'auto', padding: 10
+                  }}
+                  size={15}
+                  color={Colors.blue}
+                  name={hideShowHint ? 'eye-off' : 'eye'}
+                />
+              </TouchableWithoutFeedback>
+            ) : null}
+          </View>
         </View>
         <View
           style={{
@@ -644,6 +730,17 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
         </View> : null}
+        <View style={{
+          marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+          marginBottom: hp( 1 )
+        }}>
+          <BottomInfoBox
+            title={'Note'}
+            infoText={'Make sure you remember the encryption password and keep it safe'}
+            italicText={''}
+            backgroundColor={Colors.white}
+          />
+        </View>
       </KeyboardAwareScrollView>
       // </ScrollView>
     )
@@ -657,8 +754,8 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         scrollEnabled={false}
         // style={styles.rootContainer}
         style={{
-          backgroundColor: Colors.white,
-          height: `${height}%`
+          backgroundColor: Colors.backgroundColor,
+          // height: `${height}%`
 
         }}
       >
@@ -667,7 +764,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         }}>
           <TouchableOpacity
             activeOpacity={1}
-            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false )}}
+            onPress={() => {showSecurityQue( false ); showEncryptionPswd( false ); setAnswerError( '' )}}
             style={{
               width: wp( 7 ), height: wp( 7 ), borderRadius: wp( 7/2 ),
               alignSelf: 'flex-end',
@@ -766,7 +863,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
           ) : null}
           {dropdownBoxValue.id ? (
             <View style={{
-              marginTop: 15
+              marginTop: 10
             }}>
               <View
                 style={{
@@ -775,6 +872,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   alignItems: 'center',
                   paddingRight: 15,
                   borderColor: answerError ? Colors.red : Colors.borderColor,
+                  backgroundColor: Colors.white
                 }}
               >
                 <TextInput
@@ -845,8 +943,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                   flexDirection: 'row',
                   alignItems: 'center',
                   paddingRight: 15,
-                  marginTop: 15,
+                  marginTop: 10,
                   borderColor: answerError ? Colors.red : Colors.borderColor,
+                  backgroundColor: Colors.white
                 }}
               >
                 <TextInput
@@ -923,7 +1022,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
             </View>
           ) : (
             <View style={{
-              marginTop: 15
+              marginTop: 9
             }} />
           )}
           <View
@@ -976,22 +1075,34 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         Or choose your own question
             </Text>
           </TouchableOpacity> */}
-        </View>
-        {showNote ? <View style={{
-          ...styles.bottomButtonView,
-        }}>
-          {(
-            answer.trim() === confirmAnswer.trim() &&
+
+          {showNote ? <View style={{
+            ...styles.bottomButtonView,
+          }}>
+            {(
+              answer.trim() === confirmAnswer.trim() &&
             confirmAnswer.trim() &&
             answer.trim() && answerError.length === 0
-          ) && (
-            setButtonVisible()
-          ) || null}
-          {/* <View style={styles.statusIndicatorView}>
+            ) && (
+              setButtonVisible()
+            ) || null}
+            {/* <View style={styles.statusIndicatorView}>
             <View style={styles.statusIndicatorInactiveView} />
             <View style={styles.statusIndicatorActiveView} />
           </View> */}
-        </View> : null}
+          </View> : null}
+          <View style={{
+            marginTop: showNote ? hp( '0.5%' ) : hp( '4%' ),
+            marginBottom: hp( 1 )
+          }}>
+            <BottomInfoBox
+              title={'Note'}
+              infoText={'The Answer is used to encrypt the backup. The security Question acts as a hint to remember the same'}
+              italicText={''}
+              backgroundColor={Colors.white}
+            />
+          </View>
+        </View>
       </KeyboardAwareScrollView>
     )
   }
@@ -1110,159 +1221,32 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
               infoTextNormal1={''}
               step={''}
             />
-            <TouchableOpacity
-              onPress={() => setActiveIndex( 0 )}
-              style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 0 ?  Colors.lightBlue: Colors.backgroundColor1,
-                alignSelf: 'center', justifyContent: 'center',
-                borderRadius: wp( '4' ),
-                marginVertical: hp( '3%' )
-              }}>
-              <View style={{
-                flexDirection:'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginHorizontal: wp( '4%' )
-              }}>
-                <View style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  // borderWidth: 0.3,
-                  // borderColor: Colors.borderColor,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  elevation: 10,
-                  // shadowColor: Colors.gray,
-                  shadowOpacity: 0.1,
-                  shadowOffset: {
-                    width: 1, height: 1
-                  },
-                }}>
-                  {activeIndex === 0 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../assets/images/icons/checkmark.png' )}
-                    />
-                  }
-                </View>
-                {activeIndex === 0 ?
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_questions.png' )}
-                  />
-                  :
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/question_inactive.png' )}
-                  />
-                }
-
-                <View >
-                  <Text style={{
-                    fontSize: RFValue( 13 ), fontFamily: activeIndex === 0 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.blue
-                  }}>
-                    Use answer to a Security Question
-                  </Text>
-                  <Text style={{
-                    fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 0 ? Colors.white : Colors.textColorGrey
-                  }}>
-                     Easier to remember. Recommended
-                  </Text>
-                </View>
-              </View>
-              {/* {isSelected && ( */}
-
-
-              {/* )} */}
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setActiveIndex( 1 )}
-              style={{
-                width: '90%', height: hp( '12%' ), backgroundColor: activeIndex === 1 ? Colors.lightBlue : Colors.backgroundColor1,
-                alignSelf: 'center', justifyContent: 'center',
-                borderRadius: wp( '4' ),
-                // marginVertical: hp( '3%' )
-              }}>
-              <View style={{
-                flexDirection:'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                marginHorizontal: wp( '5%' ),
-              }}>
-                <View style={{
-                  width: 18,
-                  height: 18,
-                  borderRadius: 9,
-                  // borderWidth: 0.3,
-                  // borderColor: Colors.borderColor,
-                  backgroundColor: Colors.white,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  elevation: 10,
-                  // shadowColor: Colors.gray,
-                  shadowOpacity: 0.1,
-                  shadowOffset: {
-                    width: 1, height: 1
-                  },
-                }}>
-                  {activeIndex === 1 &&
-                    <Image
-                      style={{
-                        width: '100%', height: '100%'
-                      }}
-                      source={require( '../assets/images/icons/checkmark.png' )}
-                    />
-                  }
-                </View>
-                {activeIndex === 1 ?
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_password_active.png' )}
-                  />
-                  :
-                  <Image
-                    style={{
-                      width: 27, height: 27, resizeMode: 'contain'
-                    }}
-                    source={require( '../assets/images/icons/icon_password.png' )}
-                  />
-                }
-                <View >
-                  <Text style={{
-                    fontSize: RFValue( 13 ), fontFamily: activeIndex === 1 ? Fonts.FiraSansMedium : Fonts.FiraSansRegular, color:  activeIndex === 1 ? Colors.white : Colors.blue
-                  }}>
-                    Use your own encryption password
-                  </Text>
-                  <Text style={{
-                    fontSize: RFValue( 11 ), fontFamily: Fonts.FiraSansRegular, color: activeIndex === 1 ? Colors.white : Colors.textColorGrey
-                  }}>
-                    Make sure you remember and keep it safe
-                  </Text>
-                </View>
-              </View>
-              {/* {isSelected && ( */}
-
-
-              {/* )} */}
-            </TouchableOpacity>
-
-
+            <CardWithRadioBtn
+              icon={activeIndex === 0 ? require( '../assets/images/icons/icon_questions.png' ) : require( '../assets/images/icons/question_inactive.png' )}
+              mainText={'Answer to a Security Question'}
+              subText={'Easier to remember. Recommended'}
+              isSelected={activeIndex === 0}
+              setActiveIndex={setActiveIndex}
+              index={0}
+            />
+            <CardWithRadioBtn
+              icon={activeIndex === 1 ? require( '../assets/images/icons/icon_password_active.png' ) : require( '../assets/images/icons/icon_password.png' )}
+              mainText={'Use your own encryption password'}
+              subText={'Choose any password. Make sure you remember and keep it safe'}
+              isSelected={activeIndex === 1}
+              setActiveIndex={setActiveIndex}
+              index={1}
+            />
           </TouchableOpacity>
 
         </View>
       </ScrollView>
 
-
+      <View style={styles.statusIndicatorView}>
+        <View style={styles.statusIndicatorInactiveView} />
+        <View style={styles.statusIndicatorInactiveView} />
+        <View style={styles.statusIndicatorActiveView} />
+      </View>
       {showNote && !visibleButton ? (
         <View
           style={{
@@ -1272,8 +1256,9 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
         >
           <BottomInfoBox
             title={'Note'}
-            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the Security Centre '}
+            infoText={'Initial cloud backup ensures you have a way to restore if you lose your phone. You can change this from the '}
             italicText={'Security Centre'}
+            backgroundColor={Colors.white}
           />
         </View>
       ) : null}
@@ -1331,20 +1316,21 @@ const styles = StyleSheet.create( {
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 15,
     height: 50,
     marginLeft: 20,
     marginRight: 20,
     paddingLeft: 15,
     paddingRight: 15,
     alignItems: 'center',
+    backgroundColor: Colors.white,
   },
   dropdownBoxOpened: {
     flexDirection: 'row',
     borderColor: Colors.borderColor,
     borderWidth: 0.5,
     borderRadius: 10,
-    marginTop: 30,
+    marginTop: 15,
     height: 50,
     marginLeft: 20,
     marginRight: 20,
@@ -1381,7 +1367,7 @@ const styles = StyleSheet.create( {
     flexDirection: 'row',
     paddingLeft: 30,
     paddingRight: 30,
-    paddingBottom: 40,
+    paddingBottom: hp( 2 ),
     alignItems: 'center',
   },
   bottomButtonView1: {
@@ -1392,6 +1378,8 @@ const styles = StyleSheet.create( {
   statusIndicatorView: {
     flexDirection: 'row',
     marginLeft: 'auto',
+    marginHorizontal: wp( '6%' ),
+    marginBottom: hp( 2 )
   },
   statusIndicatorActiveView: {
     height: 5,
@@ -1426,12 +1414,13 @@ const styles = StyleSheet.create( {
     backgroundColor: Colors.white,
   },
   modalInputBox: {
-    // flex: 1,
+    flex: 1,
     height: 50,
     fontSize: RFValue( 13 ),
     color: Colors.textColorGrey,
     fontFamily: Fonts.FiraSansRegular,
     paddingLeft: 15,
+
   },
   dropdownBoxText: {
     color: Colors.textColorGrey,
@@ -1461,6 +1450,9 @@ const styles = StyleSheet.create( {
   helpText: {
     fontSize: RFValue( 12 ),
     color: Colors.textColorGrey,
-    paddingHorizontal: 24,
+    marginRight: wp( 5 ),
+    alignSelf: 'flex-end',
+    width: wp( '72%' ),
+    textAlign: 'right'
   }
 } )

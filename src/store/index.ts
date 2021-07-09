@@ -54,7 +54,6 @@ import {
   generateSecondaryXprivWatcher,
   resetTwoFAWatcher,
   fetchDerivativeAccBalanceTxWatcher,
-  setupDonationAccountWatcher,
   updateDonationPreferencesWatcher,
   addNewAccountShellsWatcher,
   syncViaXpubAgentWatcher,
@@ -130,11 +129,9 @@ import {
 
 import {
   fetchWyreReservationWatcher,
-  fetchWyreReceiveAddressWatcher
 } from './sagas/WyreIntegration'
 import {
   fetchRampReservationWatcher,
-  fetchRampReceiveAddressWatcher
 } from './sagas/RampIntegration'
 import { versionHistoryWatcher } from './sagas/versionHistory'
 import walletRescanningReducer from './reducers/wallet-rescanning'
@@ -225,7 +222,6 @@ const rootSaga = function* () {
     fetchDerivativeAccBalanceTxWatcher,
     syncViaXpubAgentWatcher,
     feeAndExchangeRatesWatcher,
-    setupDonationAccountWatcher,
     updateDonationPreferencesWatcher,
     refreshAccountShellWatcher,
     addNewAccountShellsWatcher,
@@ -327,11 +323,9 @@ const rootSaga = function* () {
 
     // Wyre Integration
     fetchWyreReservationWatcher,
-    fetchWyreReceiveAddressWatcher,
 
     // Ramp Integration
     fetchRampReservationWatcher,
-    fetchRampReceiveAddressWatcher,
 
     //VersionHistory integration
     versionHistoryWatcher,
