@@ -23,6 +23,7 @@ import { useBottomSheetModal } from '@gorhom/bottom-sheet'
 import defaultBottomSheetConfigs from '../../common/configs/BottomSheetConfigs'
 import ModalContainer from '../../components/home/ModalContainer'
 import AccountUtilities from '../../bitcoin/utilities/accounts/AccountUtilities'
+import { translations } from '../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -32,6 +33,8 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const dispatch = useDispatch()
   const [ hideShow, setHideShow ] = useState( false )
   const [ receiveModal, setReceiveModal ] = useState( false )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const [ amount, setAmount ] = useState( '' )
   const allAccounts = useSelector(
@@ -57,7 +60,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
     if ( allAccounts ) {
       const acc = []
       for ( const [ key, value ] of Object.entries( allAccounts ) ) {
-        acc.push( value )
+        if( value.isUsable ) acc.push( value )
       }
       setAccounts( acc )
       setSelectedAccount( acc[ 0 ] )
@@ -84,8 +87,8 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
   const showReceiveAmountBottomSheet = useCallback( () => {
     return(
       <ReceiveAmountContent
-        title={'Receive sats'}
-        message={'Receive sats into the selected account'}
+        title={strings.Receivesats}
+        message={strings.Receivesatsinto}
         onPressConfirm={( amount ) => {
           setAmount( amount )
           setReceiveModal( false )
@@ -118,7 +121,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           <View
             style={styles.text}
           >
-            <Text style={styles.titleText}>{'Enter amount to receive'}</Text>
+            <Text style={styles.titleText}>{amount ? amount : strings.Enteramount}</Text>
           </View>
 
           <View style={{
@@ -147,15 +150,17 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
 
               <View style={styles.dropDownView}>
                 <ScrollView>
-                  {accounts.map( ( value ) => {
+                  {accounts.map( ( value, index ) => {
                     return (
-                      <TouchableOpacity activeOpacity={0.65} onPress={() => {
-                        setHideShow( false )
-                        setSelectedAccount( value )
-                      }}
-                      style={{
-                        ...styles.dropDownElement,
-                      }}>
+                      <TouchableOpacity
+                        key={index}
+                        activeOpacity={0.65} onPress={() => {
+                          setHideShow( false )
+                          setSelectedAccount( value )
+                        }}
+                        style={{
+                          ...styles.dropDownElement,
+                        }}>
                         {/* <View style={styles.imageView}>
                           <Image source={value.accountImage} style={{
                             width: wp( '8%' ), height: wp( '8%' )
@@ -166,7 +171,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
                           marginLeft: wp( '2%' ), alignSelf: 'center',
                         }}>
                           <Text style={styles.accountName}>{value.accountName}</Text>
-                          <Text style={styles.balanceText}>Balance {UsNumberFormat( value.balance )} sats</Text>
+                          <Text style={styles.balanceText}>{strings.Balance} {UsNumberFormat( value.balance )} sats</Text>
                         </View>
                       </TouchableOpacity>
                     )
@@ -178,7 +183,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
         ) : null}
 
         <View style={styles.text1}>
-          <Text style={styles.titleText}>{'Receiving To: '}</Text>
+          <Text style={styles.titleText}>{strings.ReceivingTo}</Text>
         </View>
         {selectedAccount && <View
           style={{
@@ -206,7 +211,7 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
               <Text style={styles.accountName}>{selectedAccount && selectedAccount.accountName
                 ? selectedAccount.accountName
                 : ''}</Text>
-              <Text style={styles.balanceText}>Balance {selectedAccount ? selectedAccount.balance : ''} sats</Text>
+              <Text style={styles.balanceText}>{strings.Balance} {selectedAccount ? selectedAccount.balance : ''} sats</Text>
             </View>
             <View style={{
               marginLeft: 'auto'
@@ -225,8 +230,8 @@ const ReceiveQrScreen: React.FC<Props> = ( { navigation, }: Props ) => {
           {showReceiveAmountBottomSheet()}
         </ModalContainer>
         <BottomInfoBox
-          title="Note"
-          infoText="It would take some time for the sats to reflect in your account based on the network congestion"
+          title={common.note}
+          infoText={strings.Itwouldtake}
         />
       </ScrollView>
     </View>

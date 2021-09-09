@@ -1,5 +1,5 @@
 import React, { memo, useState } from 'react'
-import { View, Text, StyleSheet, FlatList, Image, TextInput, KeyboardAvoidingView, Platform } from 'react-native'
+import { View, Text, StyleSheet, FlatList, Image, TextInput, TouchableOpacity, Platform } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
 import { AppBottomSheetTouchableWrapper } from '../AppBottomSheetTouchableWrapper'
@@ -8,10 +8,10 @@ import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
 import Fonts from '../../common/Fonts'
-import {
-  TouchableOpacity,
-} from '@gorhom/bottom-sheet'
 import BottomInfoBox from '../BottomInfoBox'
+import { translations } from '../../common/content/LocContext'
+
+
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 const ReceiveAmountContent = ( {
   title,
@@ -21,6 +21,7 @@ const ReceiveAmountContent = ( {
   onPressBack
 } ) => {
   const [ amount, setAmount ] = useState( selectedAmount )
+  const common  = translations[ 'common' ]
 
   return (
     <View style={styles.modalContentContainer}>
@@ -72,7 +73,7 @@ const ReceiveAmountContent = ( {
               }}
               style={styles.successModalButtonView}
             >
-              <Text style={styles.proceedButtonText}>Receive</Text>
+              <Text style={styles.proceedButtonText}>{common.receive}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               onPress={() => onPressBack()}
@@ -81,7 +82,7 @@ const ReceiveAmountContent = ( {
               <Text style={{
                 ...styles.proceedButtonText, color: Colors.blue
               }}>
-            Back
+                {common.back}
               </Text>
             </TouchableOpacity>
           </View>

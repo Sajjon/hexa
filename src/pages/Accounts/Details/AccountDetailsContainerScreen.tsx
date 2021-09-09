@@ -46,6 +46,7 @@ import { RootSiblingParent } from 'react-native-root-siblings'
 import ErrorModalContents from '../../../components/ErrorModalContents'
 import SavingAccountAlertBeforeLevel2 from '../../../components/know-more-sheets/SavingAccountAlertBeforeLevel2'
 import { AccountType } from '../../../bitcoin/utilities/Interface'
+import { translations } from '../../../common/content/LocContext'
 
 export type Props = {
   navigation: any;
@@ -65,6 +66,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const accountShellID = useMemo( () => {
     return navigation.getParam( 'accountShellID' )
   }, [ navigation ] )
+  const strings  = translations[ 'accounts' ]
+  const common  = translations[ 'common' ]
 
   const [ webView, showWebView ] = useState( false )
   const swanDeepLinkContent = navigation.getParam( 'swanDeepLinkContent' )
@@ -229,8 +232,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountAlertContent = useCallback( () => {
     return (
       <ErrorModalContents
-        title={'Complete Level 2'}
-        info={'You can only add a Savings Account when you have completed Level 2'}
+        title={strings.CompleteLevel2}
+        info={strings.Level2}
         isIgnoreButton={true}
         onPressProceed={() => {
           setSecureAccountAlert( false )
@@ -240,8 +243,8 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
           setSecureAccountKnowMore( true )
           setSecureAccountAlert( false )
         }}
-        proceedButtonText={'Ok'}
-        cancelButtonText={'Learn More'}
+        proceedButtonText={common.ok}
+        cancelButtonText={common.learnMore}
         isBottomImage={true}
         bottomImage={require( '../../../assets/images/icons/errorImage.png' )}
       />
@@ -251,7 +254,7 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   const renderSecureAccountKnowMoreContent = () => {
     return (
       <SavingAccountAlertBeforeLevel2
-        titleClicked={()=>{setSecureAccountKnowMore( false );  navigation.pop() }}
+        titleClicked={()=>{setSecureAccountAlert( true ); setSecureAccountKnowMore( false ) }}
         containerStyle={{
         }}
       />
@@ -362,7 +365,11 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
   }, [ accountShell ] )
 
   return (
-    <>
+    <View style={{
+      backgroundColor: Colors.backgroundColor, flex: 1
+    }}>
+
+
       <SectionList
         contentContainerStyle={styles.scrollViewContainer}
         showsVerticalScrollIndicator={false}
@@ -391,10 +398,10 @@ const AccountDetailsContainerScreen: React.FC<Props> = ( { navigation } ) => {
       <ModalContainer visible={secureAccountAlert} closeBottomSheet={() => {}} >
         {renderSecureAccountAlertContent()}
       </ModalContainer>
-      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => {}} >
+      <ModalContainer visible={secureAccountKnowMore} closeBottomSheet={() => { setSecureAccountAlert( true ); setSecureAccountKnowMore( false )  }} >
         {renderSecureAccountKnowMoreContent()}
       </ModalContainer>
-    </>
+    </View>
   )
 }
 
@@ -405,7 +412,7 @@ const styles = StyleSheet.create( {
 
   scrollViewContainer: {
     paddingTop: 20,
-    height: '100%',
+    // height: '100%',
     paddingHorizontal: 0,
     backgroundColor: Colors.backgroundColor,
   },

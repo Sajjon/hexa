@@ -258,7 +258,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
     this.state = {
       notificationData: [],
       CurrencyCode: 'USD',
-      netBalance: 0,
+      netBalance: this.props.accountsState.netBalance,
       bottomSheetState: BottomSheetState.Closed,
       currentBottomSheetKind: null,
       secondaryDeviceOtp: {
@@ -318,6 +318,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
   };
 
   onPressNotifications = async () => {
+    this.readAllNotifications()
     setTimeout( () => {
       this.setState( {
         notificationLoading: false,
@@ -345,13 +346,33 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         }
         this.currentNotificationId = ''
       } else {
-        const message = messages.find( message => message.additionalInfo === null )
+        const message = messages.find( message => message.additionalInfo === null &&  message.status === 'unread' )
         if( message ){
           this.handleNotificationBottomSheetSelection( message )
         }
       }
     }
   }
+
+  readAllNotifications= () => {
+    const { messages } = this.props
+    const arr = []
+    messages.forEach( message => {
+      if( message.status === 'unread' ) {
+        arr.push(
+          {
+            notificationId: message.notificationId,
+            status : 'read'
+          }
+        )
+        this.props.updateMessageStatusInApp( message.notificationId )
+      }
+    } )
+    if( arr.length > 0 ) {
+      this.props.updateMessageStatus( arr )
+    }
+  }
+
   handleNotificationBottomSheetSelection = ( message ) => {
     const storeName = Platform.OS == 'ios' ? 'App Store' : 'Play Store'
     this.setState( {
@@ -643,7 +664,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       if( this.props.cloudBackupStatus == CloudBackupStatus.FAILED && this.props.levelHealth.length >= 1 && this.props.cloudPermissionGranted === true ) {
         this.openBottomSheet( BottomSheetKind.CLOUD_ERROR )
       }
-      this.calculateNetBalance()
 
       if( newBHRFlowStarted === true )
       {
@@ -720,12 +740,11 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
 
   componentDidUpdate = ( prevProps, prevState ) => {
     if (
-      prevProps.accountsState.accountShells !==
-      this.props.accountsState.accountShells
-    ) {
-      this.calculateNetBalance()
-      // this.getNewTransactionNotifications()
-    }
+      prevProps.accountsState.netBalance !==
+      this.props.accountsState.netBalance
+    )  this.setState( {
+      netBalance: this.props.accountsState.netBalance,
+    } )
 
     if (
       prevProps.secondaryDeviceAddressValue !==
@@ -879,24 +898,6 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
       }
     } )
   }
-
-  calculateNetBalance = () => {
-    const { accountShells } = this.props.accountsState
-
-    let totalBalance = 0
-    accountShells.forEach( ( accountShell: AccountShell ) => {
-      if (
-        accountShell.primarySubAccount.sourceKind !==
-        SourceAccountKind.TEST_ACCOUNT
-      )
-        totalBalance += AccountShell.getTotalBalance( accountShell )
-    } )
-
-    this.setState( {
-      netBalance: totalBalance,
-    } )
-  };
-
 
   handleAccountCardSelection = ( selectedAccount: AccountShell ) => {
     this.props.navigation.navigate( 'AccountDetails', {
