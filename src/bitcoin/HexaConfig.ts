@@ -47,6 +47,7 @@ class HexaConfig {
   public DONATION_GAP_LIMIT = Config.BIT_DONATION_GAP_LIMIT? parseInt( Config.BIT_DONATION_GAP_LIMIT.trim(), 10 ) : 50;
   public DONATION_GAP_LIMIT_INTERNAL = Config.DONATION_GAP_LIMIT_INTERNAL? parseInt( Config.DONATION_GAP_LIMIT_INTERNAL.trim(), 10 ) : 20;
 
+  public HEXA_RELEASE_NOTIFICATION_VERSION=2
   public DERIVATIVE_GAP_LIMIT = 5;
   public CIPHER_SPEC: {
     algorithm: string;
