@@ -68,7 +68,7 @@ export default class Relay {
           HEXA_ID,
           walletID,
           FCMs,
-          hexaVersion: config.HEXA_RELEASE_NOTIFICATION_VERSION
+          hexaReleaseVersion: config.HEXA_RELEASE_NOTIFICATION_VERSION
         } )
       } catch ( err ) {
         if ( err.response ) throw new Error( err.response.data.err )
