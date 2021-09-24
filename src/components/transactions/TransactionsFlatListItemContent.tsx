@@ -234,13 +234,15 @@ const styles = StyleSheet.create( {
 
   titleText: {
     color: Colors.greyTextColor,
-    fontSize: RFValue( 13 ),
+    fontSize: RFValue( 12 ),
     marginBottom: 2,
-    fontWeight: 'bold',
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   subtitleText: {
     fontSize: RFValue( 10 ),
+    color: Colors.gray2,
+    fontFamily: Fonts.FiraSansRegular,
   },
 
   bitcoinImage: {

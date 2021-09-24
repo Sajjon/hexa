@@ -5,9 +5,12 @@ import {
   StyleSheet,
 } from 'react-native'
 import QR from 'react-native-qrcode-svg'
+import { RFValue } from 'react-native-responsive-fontsize'
 import {
   heightPercentageToDP as hp,
 } from 'react-native-responsive-screen'
+import Colors from '../common/Colors'
+import Fonts from '../common/Fonts'
 
 export type Props = {
   value: string;
@@ -46,10 +49,12 @@ const styles = StyleSheet.create( {
     backgroundColor: '#e3e3e3',
   },
   textQr: {
-    color: '#6c6c6c',
-    fontSize: 17,
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 14 ),
+    letterSpacing: 0.7,
     textAlign: 'center',
     paddingVertical: 7,
+    fontFamily: Fonts.FiraSansRegular,
   },
 } )
 

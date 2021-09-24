@@ -47,7 +47,7 @@ const styles = StyleSheet.create( {
     fontSize: RFValue( 12 ),
     fontFamily: Fonts.FiraSansRegular,
     textAlign: 'justify',
-    letterSpacing: RFValue( 0.6 ),
+    letterSpacing: 0.1,
     lineHeight: RFValue( 18 )
   },
 } )

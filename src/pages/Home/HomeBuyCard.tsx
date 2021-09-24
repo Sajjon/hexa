@@ -124,7 +124,7 @@ const HomeBuyCard = ( {
               {setCurrencyCodeToImage( getCurrencyImageName( currencyCode ), Colors.blue )}
             </Text>
           )}
-          <Text>{amount ? amount : '--'}</Text>
+          <Text style={styles.amountStyle}>{amount ? amount : '--'}</Text>
           <Text>{incramount}</Text>
         </View>
       </View>
@@ -164,24 +164,23 @@ const HomeBuyCard = ( {
     </View>
   )
 }
-// const styles = StyleSheet.create( {
-//   titleStyle: {
-//     color: Colors.blue,
-//     fontSize: RFValue( 11 ),
-//     letterSpacing: 0.33,
-//     fontFamily: Fonts.FiraSansRegular,
-//   },
-//   subTitleStyle: {
-//     color: Colors.gray8,
-//     fontSize: RFValue( 9 ),
-//   },
-//   cardBitCoinImage: {
-//     width: wp( '3.5%' ),
-//     height: wp( '3.5%' ),
-//     marginRight: 5,
-//     resizeMode: 'contain',
-//     marginBottom: wp( '0.7%' ),
-//   },
-// } )
+const styles = StyleSheet.create( {
+  amountStyle: {
+    color: Colors.textColorGrey,
+    fontSize: RFValue( 12 ),
+    fontFamily: Fonts.FiraSansRegular,
+  },
+  subTitleStyle: {
+    color: Colors.gray8,
+    fontSize: RFValue( 9 ),
+  },
+  cardBitCoinImage: {
+    width: wp( '3.5%' ),
+    height: wp( '3.5%' ),
+    marginRight: 5,
+    resizeMode: 'contain',
+    marginBottom: wp( '0.7%' ),
+  },
+} )
 
 export default HomeBuyCard
