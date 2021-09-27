@@ -45,6 +45,12 @@ const WalletSettingsContainerScreen: React.FC<Props> = ( { navigation, }: Props 
       imageSource: require( '../../../assets/images/icons/country.png' ),
       screenName: 'ChangeCurrency',
     },
+    {
+      title: strings.AppInfo,
+      imageSource: require( '../../../assets/images/icons/icon_info.png' ),
+      subtitle: strings.AppInfoSub,
+      screenName: 'AppInfo',
+    },
     // {
     //   title: 'Full Rescan',
     //   subtitle: 'Completely sync the account',
