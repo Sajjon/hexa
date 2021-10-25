@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList
+  FlatList, Image
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -33,8 +33,11 @@ import RightArrow from '../../assets/images/svgs/icon_arrow.svg'
 import ManageGiftsList from './ManageGiftsList'
 import IconAdd from '../../assets/images/svgs/icon_add.svg'
 import IconAddLight from '../../assets/images/svgs/icon_add_light.svg'
+import CheckingAcc from '../../assets/images/svgs/icon_checking.svg'
 import GiftKnowMore from '../../components/know-more-sheets/GiftKnowMoreModel'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import RecipientAvatar from '../../components/RecipientAvatar'
+import { RecipientDescribing } from '../../common/data/models/interfaces/RecipientDescribing'
 
 const listItemKeyExtractor = ( item ) => item.id
 
@@ -46,6 +49,11 @@ const ManageGifts = ( { navigation } ) => {
   // const [ giftDetails, showGiftDetails ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
+  const trustedContacts: Trusted_Contacts = useSelector(
+    ( state ) => state.trustedContacts.contacts,
+  )
+  const trustedContactsArr = Object.values( trustedContacts ?? {
+  } )
   const [ giftsArr, setGiftsArr ] = useState( null )
   const [ active, setActive ] = useState( GiftStatus.CREATED )
   const [ knowMore, setKnowMore ] = useState( false )
@@ -76,8 +84,8 @@ const ManageGifts = ( { navigation } ) => {
       if ( gift.type === GiftType.RECEIVED ) {
         receivedArr.push( gift )
       } else {
-        if ( gift.status === GiftStatus.CREATED ) availableGifts.push( gift )
-        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.RECLAIMED || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
+        if ( gift.status === GiftStatus.CREATED || gift.status === GiftStatus.RECLAIMED ) availableGifts.push( gift )
+        if ( gift.status === GiftStatus.SENT || gift.status === GiftStatus.ACCEPTED ) sentAndClaimed.push( gift )
         if ( gift.status === GiftStatus.EXPIRED ) expiredArr.push( gift )
       }
     } )
@@ -114,6 +122,7 @@ const ManageGifts = ( { navigation } ) => {
 
     switch ( selectedGift.status ) {
         case GiftStatus.CREATED:
+        case GiftStatus.RECLAIMED:
           navigation.navigate( 'GiftDetails', {
             title, walletName, gift: selectedGift, avatar: false
           } )
@@ -212,19 +221,7 @@ const ManageGifts = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setKnowMore( true )}
-            style={{
-              ...styles.selectedContactsView,
-            }}
-          >
-            {/* <Image
-                    style={styles.addGrayImage}
-                    source={require( '../../assets/images/icons/icon_add_grey.png' )}
-                  /> */}
-            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
 
-          </TouchableOpacity>
         </View>
 
         <View style={{
@@ -238,12 +235,20 @@ const ManageGifts = ( { navigation } ) => {
             infoTextNormal1={''}
             step={''}
           />
+          <TouchableOpacity
+            onPress={() => setKnowMore( true )}
+            style={{
+              ...styles.selectedContactsView,
+            }}
+          >
+            <Text style={styles.contactText}>{common[ 'knowMore' ]}</Text>
 
+          </TouchableOpacity>
 
         </View>
         <ScrollView
           style={{
-            marginHorizontal: wp( 4 )
+            marginHorizontal: wp( 4 ), paddingVertical: hp( 2 )
           }}
           horizontal>
           {
@@ -253,7 +258,14 @@ const ManageGifts = ( { navigation } ) => {
                 <TouchableOpacity
                   key={item}
                   style={[ styles.buttonNavigator, {
-                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor
+                    backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
+                    shadowColor: active === item ? '#77B9EB96' : Colors.white,
+                    shadowOpacity: 0.9,
+                    shadowOffset: {
+                      width: 5, height: 6
+                    },
+                    shadowRadius: 10,
+                    elevation: 6,
                   } ]}
                   onPress={() => buttonPress( item )}
                 >
@@ -309,7 +321,30 @@ const ManageGifts = ( { navigation } ) => {
           keyExtractor={listItemKeyExtractor}
           renderItem={( { item, index } ) => {
             const title = item.status === GiftStatus.CREATED ? 'Available Gift' : item.type === GiftType.SENT ? item.type === GiftStatus.SENT ? 'Sent to recipient' : 'Claimed by the recipient' : 'Received Gift'
-            const walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            let walletName = item.type === GiftType.RECEIVED ? item.sender?.walletName : item.receiver?.walletName ? item.receiver?.walletName : item.receiver?.contactId?.length > 30 ? `${item.receiver?.contactId.substr( 0, 27 )}...` : item.receiver?.contactId
+            // let image
+            let contactDetails : RecipientDescribing
+            if ( item.type === GiftType.SENT && item.receiver?.contactId ) {
+              const arr =trustedContactsArr.filter( value => {
+                return item.permanentChannelAddress === value.receiver?.contactId
+              } )
+              contactDetails = arr[ 0 ]?.contactDetails
+              walletName = arr[ 0 ]?.contactDetails?.contactName
+              // image = arr[ 0 ]?.contactDetails?.image?.uri
+            }
+            if ( item.type === GiftType.RECEIVED && item.sender?.contactId ) {
+              const arr =trustedContactsArr.filter( value => {
+                console.log( value.permanentChannelAddress, value.sender?.contactId )
+
+                return item.permanentChannelAddress === value.sender?.contactId
+              } )
+              contactDetails = arr[ 0 ]?.contactDetails
+              walletName = arr[ 0 ]?.contactDetails?.contactName
+              // image = arr[ 0 ]?.contactDetails?.image?.uri
+            }
+            if( contactDetails ) {
+              contactDetails.displayedName = walletName
+            }
             return (
               <>
                 {active === GiftStatus.CREATED ?
@@ -330,7 +365,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true
+                          title, walletName, gift: item, avatar: true, contactDetails
                         } )
                       }
                       }
@@ -341,46 +376,41 @@ const ManageGifts = ( { navigation } ) => {
                       }}
                     >
                       <View style={{
-                        flexDirection: 'row', justifyContent: 'space-between', marginVertical: hp( 0.5 ), marginTop: hp( 1.5 )
-                      }}>
-                        <Text style={{
-                          color: Colors.lightTextColor,
-                          fontSize: RFValue( 10 ),
-                          letterSpacing: 0.7,
-                          fontFamily: Fonts.FiraSansRegular,
-                          fontWeight: '700'
-                        }}>
-                          {title}
-                        </Text>
-                        <Text style={{
-                          color: Colors.lightTextColor,
-                          fontSize: RFValue( 10 ),
-                          letterSpacing: 0.1,
-                          fontFamily: Fonts.FiraSansRegular,
-                          alignSelf: 'flex-end'
-                        }}>
-                          {moment( item.createdAt ).format( 'lll' )}
-                        </Text>
-                      </View>
-
-                      <View style={{
                         ...styles.listItem
                       }}
                       >
-                        <View style={styles.avatarContainer}>
-                          {/* <RecipientAvatar recipient={contactDescription.contactDetails} contentContainerStyle={styles.avatarImage} /> */}
-                        </View>
+                        {walletName && contactDetails ?
+                          <View style={styles.avatarContainer}>
+                            <RecipientAvatar recipient={contactDetails} contentContainerStyle={styles.avatarImage} />
+                          </View>
+                          :
+                          <CheckingAcc />
+                        }
                         <View style={{
                           alignItems: 'flex-start', marginHorizontal: wp( 2 )
                         }}>
                           <Text style={{
-                            textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                            color: Colors.lightTextColor,
+                            fontSize: RFValue( 10 ),
+                            letterSpacing: 0.8,
+                            fontFamily: Fonts.FiraSansRegular,
+                            fontWeight: '600'
                           }}>
-                            {walletName}
+                            {title}
                           </Text>
                           <Text style={{
-                            ...styles.secondNamePieceText, fontFamily: Fonts.FiraSansRegular
-                          }}>Lorem ipsum dolor sit amet</Text>
+                            fontSize: RFValue( 12 ), textAlign: 'center', fontFamily: Fonts.FiraSansRegular, color: Colors.textColorGrey
+                          }}>
+                            {walletName ? walletName : 'Checking Account'}
+                          </Text>
+                          <Text style={{
+                            color: Colors.lightTextColor,
+                            fontSize: RFValue( 10 ),
+                            letterSpacing: 0.1,
+                            fontFamily: Fonts.FiraSansRegular,
+                          }}>
+                            {moment( item.createdAt ).format( 'lll' )}
+                          </Text>
                         </View>
                         <View style={{
                           marginLeft: 'auto',
@@ -400,7 +430,9 @@ const ManageGifts = ( { navigation } ) => {
                             </Text>
                           </Text>
                         </View>
-                        <RightArrow />
+                        <RightArrow style={{
+                          marginHorizontal: wp( 1 )
+                        }}/>
                       </View>
 
                     </TouchableOpacity>
@@ -439,7 +471,7 @@ const ManageGifts = ( { navigation } ) => {
               {/* <ScrollView style={{
               flex: 1
             }}> */}
-              {timer && [ 1, 2, 3 ].map( ( value, index ) => {
+              {/* {timer && [ 1, 2, 3 ].map( ( value, index ) => {
                 return (
                   <View key={index} style={styles.scrollViewContainer}>
 
@@ -493,7 +525,7 @@ const ManageGifts = ( { navigation } ) => {
                     </View>
                   </View>
                 )
-              } )}
+              } )} */}
               {/* </ScrollView> */}
             </View>
 
@@ -535,10 +567,10 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-between',
   },
   createGiftText: {
-    color: Colors.darkBlue,
+    color: Colors.blueText,
     fontSize: RFValue( 12 ),
     letterSpacing: 0.3,
-    fontFamily: Fonts.FiraSansRegular,
+    fontFamily: Fonts.FiraSansMedium,
     marginHorizontal: wp( 2 )
   },
   centeredView: {
@@ -556,7 +588,7 @@ const styles = StyleSheet.create( {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: Colors.borderColor,
-    borderRadius: wp( 3 )
+    borderRadius: wp( 3 ),
   },
   modalTitleText: {
     color: Colors.blue,
@@ -573,9 +605,9 @@ const styles = StyleSheet.create( {
     marginHorizontal: wp( 1 ),
   },
   avatarContainer: {
-    ...ImageStyles.circledAvatarContainer,
-    ...ImageStyles.thumbnailImageMedium,
-    borderRadius: wp( 9 ) / 2,
+    width: wp( 10 ),
+    height: wp( 10 ),
+    borderRadius: wp( 10 ) / 2,
   },
   listItem: {
     marginVertical: hp( 0.5 ),
@@ -600,9 +632,11 @@ const styles = StyleSheet.create( {
     justifyContent: 'space-around',
     backgroundColor: Colors.lightBlue,
     borderRadius: wp( 2 ),
-    height: hp( 4 ),
+    height: hp( 3.6 ),
     paddingHorizontal: wp( 2 ),
-    marginRight: wp( 4 )
+    marginTop: wp( 2.7 ),
+    marginRight: wp( 4 ),
+    alignSelf: 'flex-start'
   },
   createView: {
     position: 'absolute',

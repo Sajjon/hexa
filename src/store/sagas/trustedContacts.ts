@@ -54,7 +54,7 @@ import {
 } from '../../bitcoin/utilities/Interface'
 import Toast from '../../components/Toast'
 import DeviceInfo from 'react-native-device-info'
-import { exchangeRatesCalculated, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
+import { exchangeRatesCalculated, giftAccepted, setAverageTxFee, updateAccountShells, updateGift } from '../actions/accounts'
 import { AccountsState } from '../reducers/accounts'
 import config from '../../bitcoin/HexaConfig'
 import idx from 'idx'
@@ -167,7 +167,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
 
   for( const giftId in storedGifts ){
     if( channelAddress === storedGifts[ giftId ].channelAddress ) {
-      Toast( 'Gift already exist' )
+      Toast( 'Gift already added' )
       return
     }
   }
@@ -208,6 +208,7 @@ function* fetchGiftFromChannelWorker( { payload }: { payload: { channelAddress: 
     gift.timestamps.accepted = Date.now()
 
     yield put( updateGift( gift ) )
+    yield put( giftAccepted( gift.channelAddress ) )
     yield call( associateGiftWorker, {
       payload: {
         giftId: gift.id
@@ -304,6 +305,8 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   const storedGifts: {[id: string]: Gift} = yield select( ( state ) => state.accounts.gifts )
   const gift: Gift = storedGifts[ payload.giftId ]
 
+  if( gift.status === GiftStatus.ACCEPTED || gift.status === GiftStatus.RECLAIMED ) throw new Error( 'Cannot reclaim gift' )
+
   const giftChannelsToSync = {
     [ gift.channelAddress ]: {
       creator: true,
@@ -321,17 +324,22 @@ function* reclaimGiftWorker( { payload }: {payload: { giftId: string}} ) {
   } = yield call( Relay.syncGiftChannelsMetaData, giftChannelsToSync )
   const { metaData: giftMetaData } = synchedGiftChannels[ gift.channelAddress ]
 
-  if( giftMetaData.status === GiftStatus.RECLAIMED ){
+  if( giftMetaData.status !== gift.status ){
     gift.status = giftMetaData.status
-    gift.timestamps.reclaimed = Date.now()
+
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) gift.timestamps.reclaimed = Date.now()
+    else if ( giftMetaData.status === GiftStatus.ACCEPTED ) gift.timestamps.accepted = Date.now()
+
     yield put( updateGift( gift ) )
     yield call( dbManager.createGift, gift )
     yield put( updateWalletImageHealth( {
       updateGifts: true,
       giftIds: [ gift.id ]
     } ) )
-    Toast( 'Gift reclaimed' )
-  } else throw new Error( 'Unable to reclaim gift' )
+
+    if( giftMetaData.status === GiftStatus.RECLAIMED ) Toast( 'Gift reclaimed' )
+    if( giftMetaData.status === GiftStatus.ACCEPTED ) Toast( 'Gift already accepted' )
+  }
 }
 
 export const reclaimGiftWatcher = createWatcher(
@@ -381,6 +389,8 @@ function* syncGiftsStatusWorker() {
       const giftToUpdate = storedGifts[ giftChannelToGiftIdMap[ channelAddress ] ]
       if( giftToUpdate.status !== giftMetaData.status ){
         giftToUpdate.status = giftMetaData.status
+        if ( giftMetaData.status === GiftStatus.ACCEPTED ) giftToUpdate.timestamps.accepted = Date.now()
+
         yield put( updateGift( giftToUpdate ) )
         yield call( dbManager.createGift, giftToUpdate )
         yield put( updateWalletImageHealth( {

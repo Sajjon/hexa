@@ -525,7 +525,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
             if( nextAppState === 'background' ) {
               this.closeBottomSheet()
             }
-            console.log( 'inside if nextAppState', nextAppState )
+            // console.log( 'inside if nextAppState', nextAppState )
             this.props.updatePreference( {
               key: 'hasShownNoInternetWarning',
               value: false,
@@ -1063,6 +1063,7 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               channelKey: trustedContactRequest.channelKey,
               contactsSecondaryChannelKey: trustedContactRequest.contactsSecondaryChannelKey,
               isPrimaryKeeper: trustedContactRequest.isPrimaryKeeper,
+              isKeeper: trustedContactRequest.isKeeper
             } )
             // TODO: navigate post approval (from within saga)
             navigation.navigate( 'Home' )
@@ -1489,6 +1490,8 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
               inputType={giftRequest.encryptionType}
               hint={giftRequest.encryptionHint}
               note={giftRequest.note}
+              themeId={giftRequest.themeId}
+              giftId={giftRequest.channelAddress}
             />
           )
 
