@@ -712,9 +712,6 @@ export const ContactImageSchema: ObjectSchema = {
     uri: {
       type: 'string', optional: true
     },
-    base64: {
-      type: 'string', optional: true
-    },
   },
 }
 
