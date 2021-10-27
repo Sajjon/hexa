@@ -3,13 +3,16 @@ import { DeepLinkEncryptionType, ShortLinkKind, DeepLinkKind, LevelHealthInterfa
 import { encrypt } from '../encryption'
 import DeviceInfo from 'react-native-device-info'
 import config from '../../bitcoin/HexaConfig'
-import { Alert } from 'react-native'
+import { Alert, Platform } from 'react-native'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import Toast from '../../components/Toast'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import crypto from 'crypto'
 import { getVersions } from '../utilities'
 import dynamicLinks from '@react-native-firebase/dynamic-links'
+import ImageResizer from 'react-native-image-resizer'
+import RNFS from 'react-native-fs'
+
 
 export const nameToInitials = fullName => {
   if( !fullName ) return
@@ -565,4 +568,24 @@ export const processRequestQR = ( qrData: string ) => {
   } catch ( err ) {
     Alert.alert( 'Invalid/Incompatible QR, updating your app might help' )
   }
+}
+
+
+export const ImageToBase64Data = async( url ):Promise<{
+  uri: string;
+}> => {
+  let compressedImage
+  let base64Imagedata
+  await ImageResizer.createResizedImage( url, 30, 30, 'PNG', 50, 0 )
+    .then( response => {
+      compressedImage = response.uri
+    } )
+    .catch( err => {
+      console.log( 'eeee err', typeof err, err )
+    } )
+  const base64Data  = await RNFS.readFile( Platform.OS == 'ios' ? compressedImage.replace( 'file:', '' ) : compressedImage, 'base64' )
+  base64Imagedata = {
+    uri: `data:image/png;base64,${base64Data}`
+  }
+  return await base64Imagedata
 }

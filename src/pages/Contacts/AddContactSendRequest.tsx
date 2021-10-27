@@ -79,7 +79,6 @@ export default function AddContactSendRequest( props ) {
   const [ selectedContactsCHKey, setSelectedContactsCHKey ] = useState( '' )
   const [ encryptLinkWith, setEncryptLinkWith ] = useState( giftId? DeepLinkEncryptionType.NUMBER: DeepLinkEncryptionType.DEFAULT )
   const [ isOTPType, setIsOTPType ] = useState( false )
-  const [ avatarImage, setAvatarImage ]: [ImageSourcePropType, any] = useState( )
   const themeId = props.navigation.getParam( 'themeId' )
   const senderEditedName = props.navigation.getParam( 'senderName' )
   const SelectedContact = props.navigation.getParam( 'SelectedContact' )
@@ -140,35 +139,16 @@ export default function AddContactSendRequest( props ) {
 
   const createTrustedContact = useCallback( async () => {
     if( Contact.channelKey && trustedContacts[ Contact.channelKey ] ) return
-    if( avatarImage ) Contact.image = avatarImage
     dispatch( initializeTrustedContact( {
       contact: Contact,
       flowKind: InitTrustedContactFlowKind.SETUP_TRUSTED_CONTACT,
       giftId
     } ) )
-  }, [ Contact, giftId, avatarImage ] )
+  }, [ Contact, giftId ] )
 
   useEffect( ()=> {
     getContact()
-    base64Imagedata()
   }, [] )
-
-  const base64Imagedata = async()=>{
-    if( SelectedContact[ 0 ].image ){
-      let compressedImage
-      await ImageResizer.createResizedImage( SelectedContact[ 0 ].image.uri, 30, 30, 'PNG', 50, 0 )
-        .then( response => {
-          compressedImage = response.uri
-        } )
-        .catch( err => {
-          console.log( 'eeee err', typeof err, err )
-        } )
-      const base64Data  = await RNFS.readFile( Platform.OS == 'ios' ? compressedImage.replace( 'file:', '' ) : compressedImage, 'base64' )
-      setAvatarImage( {
-        uri: `data:image/png;base64,${base64Data}`
-      } )
-    }
-  }
 
   // useEffect( () => {
   //   if( giftId && encryptLinkWith === DeepLinkEncryptionType.OTP ) {
@@ -181,13 +161,12 @@ export default function AddContactSendRequest( props ) {
 
   useEffect( ()=> {
     if ( !Contact ) return
-    if ( Contact && Contact.image && !avatarImage ) return
     createTrustedContact()
     if( trustedLink || trustedQR ){
       setTrustedLink( '' )
       setTrustedQR( '' )
     }
-  }, [ Contact, avatarImage ] )
+  }, [ Contact ] )
 
   useEffect( () => {
     if( !trustedLink ) generate()  // prevents multiple generation as trusted-contact updates twice during init

@@ -75,7 +75,7 @@ import * as bip39 from 'bip39'
 import * as bitcoinJS from 'bitcoinjs-lib'
 import secrets from 'secrets.js-grempe'
 import AccountOperations from '../../bitcoin/utilities/accounts/AccountOperations'
-import { processDeepLink } from '../../common/CommonFunctions'
+import { ImageToBase64Data, processDeepLink } from '../../common/CommonFunctions'
 import { generateTrustedContact } from '../../bitcoin/utilities/TrustedContactFactory'
 
 function* generateSecondaryAssets(){
@@ -791,14 +791,17 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
   const accountsState: AccountsState = yield select( state => state.accounts )
   const accounts: Accounts = accountsState.accounts
   const FCM = yield select ( state => state.preferences.fcmTokenValue )
-  let wallet: Wallet = yield select( ( state ) => state.storage.wallet )
+  const wallet: Wallet = yield select( ( state ) => state.storage.wallet )
   const { walletId } = wallet
-
+  let base64Image
+  if( contact.image ) {
+    base64Image =  yield call( ImageToBase64Data, contact.image.uri )
+  }
   const contactInfo: ContactInfo = {
     contactDetails: {
       id: contact.id,
       contactName: contact.name,
-      image: contact.image
+      image: base64Image
     },
     flowKind,
     channelKey,
