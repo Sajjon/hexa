@@ -801,13 +801,13 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactDetails: {
       id: contact.id,
       contactName: contact.name,
-      image: base64Image,
       phoneNumbers: contact.phoneNumbers && contact.phoneNumbers.length ? contact.phoneNumbers : [],
       emails: contact.emails && contact.emails.length ? contact.emails : [],
     },
     flowKind,
     channelKey,
-    contactsSecondaryChannelKey
+    contactsSecondaryChannelKey,
+    image: base64Image
   }
   contactInfo.channelKey = contactInfo.channelKey?  contactInfo.channelKey : BHROperations.generateKey( config.CIPHER_SPEC.keyLength ) // channel-key is available during init at approvers end
 

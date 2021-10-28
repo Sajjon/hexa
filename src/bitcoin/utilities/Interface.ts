@@ -526,7 +526,8 @@ export interface ContactInfo  {
     secondaryMnemonicShard?: any,
     bhXpub?: string
   },
-  flowKind?: InitTrustedContactFlowKind
+  flowKind?: InitTrustedContactFlowKind,
+  image?: any;
 }
 export interface PrimaryStreamData {
   walletID?: string,
