@@ -37,6 +37,8 @@ const RecipientInfo = 'RecipientInfo'
 const Recipient = 'Recipient'
 const TransactionsNote = 'TransactionsNote'
 const ContactImage = 'ContactImage'
+const Emails = 'Emails'
+const PhoneNumbers = 'PhoneNumbers'
 const Gifts = 'Gifts'
 const GiftSenderReceiver = 'GiftSenderReceiver'
 const GiftDeepLinkConfig = 'GiftDeepLinkConfig'
@@ -690,6 +692,41 @@ export const StreamsSchema: ObjectSchema = {
   },
 }
 
+export const EmailsSchema: ObjectSchema = {
+  name: Emails,
+  primaryKey: 'id',
+  properties: {
+    email:{
+      type: 'string', optional: true
+    },
+    id:{
+      type: 'string', optional: true
+    },
+  },
+}
+
+export const PhoneNumbersSchema: ObjectSchema = {
+  name: PhoneNumbers,
+  primaryKey: 'id',
+  properties: {
+    countryCode:{
+      type: 'string', optional: true
+    },
+    digits:{
+      type: 'string', optional: true
+    },
+    id:{
+      type: 'string', optional: true
+    },
+    label:{
+      type: 'string', optional: true
+    },
+    number:{
+      type: 'string', optional: true
+    }
+  },
+}
+
 export const ContactDetailsSchema: ObjectSchema = {
   name: ContactDetails,
   primaryKey: 'id',
@@ -702,6 +739,12 @@ export const ContactDetailsSchema: ObjectSchema = {
     },
     image: {
       type: ContactImage, optional: true,
+    },
+    phoneNumbers: {
+      type: 'list', objectType: PhoneNumbers, default: []
+    },
+    emails: {
+      type: 'list', objectType: Emails, default: []
     },
   },
 }

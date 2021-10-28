@@ -801,7 +801,9 @@ function* initializeTrustedContactWorker( { payload } : {payload: {contact: any,
     contactDetails: {
       id: contact.id,
       contactName: contact.name,
-      image: base64Image
+      image: base64Image,
+      phoneNumbers: contact.phoneNumbers && contact.phoneNumbers.length ? contact.phoneNumbers : [],
+      emails: contact.emails && contact.emails.length ? contact.emails : [],
     },
     flowKind,
     channelKey,

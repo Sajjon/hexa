@@ -502,6 +502,8 @@ export interface ContactDetails {
   id: string,
   contactName?: string,
   image?: ImageSourcePropType | null,
+  phoneNumbers?: any[],
+  emails?: any[],
 }
 
 export interface ChannelAssets {

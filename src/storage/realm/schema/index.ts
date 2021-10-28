@@ -38,7 +38,9 @@ import {
   GiftSenderReceiverSchema,
   GiftsSchema,
   GiftDeepLinkConfigSchema,
-  GiftTimeStampsSchema
+  GiftTimeStampsSchema,
+  PhoneNumbersSchema,
+  EmailsSchema,
 } from './Schema'
 
 export default
@@ -82,5 +84,7 @@ export default
   GiftSenderReceiverSchema,
   GiftsSchema,
   GiftDeepLinkConfigSchema,
-  GiftTimeStampsSchema
+  GiftTimeStampsSchema,
+  PhoneNumbersSchema,
+  EmailsSchema
 ]

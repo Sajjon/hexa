@@ -576,7 +576,7 @@ export const ImageToBase64Data = async( url ):Promise<{
 }> => {
   let compressedImage
   let base64Imagedata
-  await ImageResizer.createResizedImage( url, 30, 30, 'PNG', 50, 0 )
+  await ImageResizer.createResizedImage( url, 50, 50, 'PNG', 50, 0 )
     .then( response => {
       compressedImage = response.uri
     } )
