@@ -610,28 +610,52 @@ class Home extends PureComponent<HomePropsTypes, HomeStateTypes> {
         console.log( 'notification', notification )
         this.props.getMessages()
         let additionalData: any
-        if( notification.data && notification.data.content ){
+        if( notification.data && notification.data.content ) {
           const { content } = notification.data
           additionalData = JSON.parse( content )
           const notificationId = JSON.parse( content ).notificationId
           this.currentNotificationId = notificationId
-        } else if( notification.data[ 'google.message_id' ] ){
+        } else if( notification.data[ 'google.message_id' ] ) {
           const notificationId = notification.data[ 'google.message_id' ]
           this.currentNotificationId = notificationId
         }
 
-        this.setState( {
-          notificationTitle: 'message.title',
-          notificationInfo: 'message.info',
-          notificationNote: '',
-          notificationAdditionalInfo: additionalData,
-          notificationProceedText: 'Okay',
-          notificationIgnoreText: '',
-          isIgnoreButton: false,
-          notificationType: additionalData.notificationType
-        }, () => {
-          this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
-        } )
+        if( additionalData.notificationType == NotificationType.FNF_KEEPER_REQUEST ){
+          this.setState( {
+            trustedContactRequest: {
+              walletName: additionalData.walletName,
+              encryptedChannelKeys: additionalData.channelKey+'-'+additionalData.contactsSecondaryChannelKey,
+              isExistingContact: true,
+              isQR: true,
+              type: QRCodeTypes.EXISTING_CONTACT,
+              isKeeper: true,
+              encryptionType: DeepLinkEncryptionType.DEFAULT,
+              encryptionHint: ''
+            }
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.TRUSTED_CONTACT_REQUEST )
+          } )
+        } else {
+          const messageTitle = [ NotificationType.FNF_KEEPER_REQUEST_ACCEPTED, NotificationType.FNF_KEEPER_REQUEST_REJECTED, NotificationType.FNF_REQUEST_ACCEPTED, NotificationType.FNF_REQUEST_REJECTED, NotificationType.FNF_TRANSACTION, 'contact' ].includes( additionalData.notificationType ) ? 'Friends & Family notification' : ''
+          const messageMessage = additionalData.notificationType == NotificationType.FNF_KEEPER_REQUEST_ACCEPTED ? 'Keeper request accepted by '+additionalData.name :
+            additionalData.notificationType == NotificationType.FNF_KEEPER_REQUEST_REJECTED ? 'Keeper request rejected by '+additionalData.name :
+              additionalData.notificationType == NotificationType.FNF_REQUEST_ACCEPTED ? 'F&F request accepted by '+additionalData.name :
+                additionalData.notificationType == NotificationType.FNF_REQUEST_REJECTED ? 'F&F request rejected by '+additionalData.name :
+                  additionalData.notificationType == NotificationType.FNF_TRANSACTION || additionalData.notificationType == 'contact' ? 'You have a new transaction from '+additionalData.name : 'New notification has arrived'
+
+          this.setState( {
+            notificationTitle: messageTitle,
+            notificationInfo: messageMessage,
+            notificationNote: '',
+            notificationAdditionalInfo: additionalData,
+            notificationProceedText: 'Okay',
+            notificationIgnoreText: '',
+            isIgnoreButton: false,
+            notificationType: additionalData.notificationType
+          }, () => {
+            this.openBottomSheet( BottomSheetKind.NOTIFICATION_INFO )
+          } )
+        }
         console.log( 'ON NOTIFICATION 4' )
         this.notificationCheck()
         // process the notification

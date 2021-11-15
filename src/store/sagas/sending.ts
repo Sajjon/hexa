@@ -440,7 +440,8 @@ function* sendTxNotificationWorker( { payload } ) {
     title: 'Friends & Family notification',
     body: `You have a new transaction from ${walletName}`,
     data: {
-      txid
+      txid,
+      name: walletName
     },
     tag: notificationTag.IMP,
   }

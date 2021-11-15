@@ -605,7 +605,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
               default:
                 notifType = notificationType.FNF_REQUEST_REJECTED
                 notifTitle = 'Friends & Family notification'
-                notifBody = `Friends & Family request rejected by ${nameAssociatedByContact || wallet.walletName}`
+                notifBody = `F&F request rejected by ${nameAssociatedByContact || wallet.walletName}`
           }
 
           const notification: INotification = {
@@ -613,6 +613,7 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             title: notifTitle,
             body: notifBody,
             data: {
+              name: nameAssociatedByContact || wallet.walletName
             },
             tag: notificationTag.IMP,
           }
@@ -692,7 +693,8 @@ export function* syncPermanentChannelsWorker( { payload }: {payload: { permanent
             title: notifTitle,
             body: notifBody,
             data: {
-              channelKey: contact.channelKey
+              channelKey: contact.channelKey,
+              name: nameAssociatedByContact || wallet.walletName
             },
             tag: notificationTag.IMP,
           }
