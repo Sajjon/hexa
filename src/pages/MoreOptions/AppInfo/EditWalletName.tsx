@@ -204,19 +204,19 @@ export default function EditWalletName( props ) {
           ) : null} */}
         </View>
         <View
-          style={{
-            ...confirmInputStyle,
-            marginBottom: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-            paddingRight: 15,
-            marginTop: 10,
-            borderColor: answerError ? Colors.red : Colors.white,
-            backgroundColor: Colors.white,
-            width: wp( 80 )
-          }}
+          // style={{
+          //   ...confirmInputStyle,
+          //   marginBottom: 15,
+          //   flexDirection: 'row',
+          //   alignItems: 'center',
+          //   paddingRight: 15,
+          //   marginTop: 10,
+          //   borderColor: answerError ? Colors.red : Colors.white,
+          //   backgroundColor: Colors.white,
+          //   width: wp( 80 )
+          // }}
         >
-          <TextInput
+          {/* <TextInput
             style={styles.modalInputBox}
             ref={confirmAnswerTextInput}
             placeholder={strings.Confirmnewwalletname}
@@ -251,7 +251,7 @@ export default function EditWalletName( props ) {
               setConfirmAnswerInputStyle( styles.inputBox )
               handleSubmit()
             }}
-          />
+          /> */}
           {/* {tempAns ? (
             <TouchableWithoutFeedback
               onPress={() => {

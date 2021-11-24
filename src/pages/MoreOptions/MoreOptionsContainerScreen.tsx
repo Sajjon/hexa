@@ -261,7 +261,7 @@ const MoreOptionsContainerScreen: React.FC<Props> = ( { navigation }: Props ) =>
             }}
             style={[ styles.otherCards, styles.extraHeight ]}
           >
-            <QueActive/>
+            <QueActive />
             <View style={{
               marginLeft: 10
             }}>
