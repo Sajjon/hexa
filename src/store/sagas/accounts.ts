@@ -105,6 +105,7 @@ import { PermanentChannelsSyncKind } from '../actions/trustedContacts'
 import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOperations'
 import BHROperations from '../../bitcoin/utilities/BHROperations'
 import { generateDeepLink } from '../../common/CommonFunctions'
+import Toast from '../../components/Toast'
 
 // to be used by react components(w/ dispatch)
 export function getNextFreeAddress( dispatch: any, account: Account | MultiSigAccount, requester?: ActiveAddressAssignee ) {
@@ -934,8 +935,7 @@ export function* addNewAccountShellsWorker( { payload: newAccountsInfo }: {paylo
     accountIds: accountIds
   } ) )
 
-  // TODO: re-enable test-coins from test-faucet post test-wrapper resurrection
-  // if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
+  if( testcoinsToAccount ) yield put( getTestcoins( testcoinsToAccount ) ) // pre-fill test-account w/ testcoins
 }
 
 export const addNewAccountShellsWatcher = createWatcher(
@@ -1217,31 +1217,37 @@ export function* generateGiftstWorker( { payload } : {payload: { amounts: number
     walletName: wallet.walletName
   }
 
-  const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
-  if( txid ) {
-    const giftIds = []
-    for( const giftId in gifts ){
-      giftIds.push( gifts[ giftId ].id )
-      yield put( updateGift( gifts[ giftId ] ) )
-    }
-    yield put( giftCreationSuccess( true ) )
+  try{
+    const { txid, gifts } = yield call( AccountOperations.generateGifts, walletDetails, account, payload.amounts, averageTxFeeByNetwork, payload.includeFee )
+    if( txid ) {
+      const giftIds = []
+      for( const giftId in gifts ){
+        giftIds.push( gifts[ giftId ].id )
+        yield put( updateGift( gifts[ giftId ] ) )
+      }
+      yield put( giftCreationSuccess( true ) )
 
-    yield call( dbManager.createGifts, gifts )
-    yield put( updateWalletImageHealth( {
-      updateGifts: true,
-      giftIds: giftIds
-    } ) )
+      yield call( dbManager.createGifts, gifts )
+      yield put( updateWalletImageHealth( {
+        updateGifts: true,
+        giftIds: giftIds
+      } ) )
 
-    // refersh the account
-    let shellToSync: AccountShell
-    for( const accountShell of accountsState.accountShells ){
-      if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+      // refersh the account
+      let shellToSync: AccountShell
+      for( const accountShell of accountsState.accountShells ){
+        if( accountShell.primarySubAccount.id === account.id ) shellToSync = accountShell
+      }
+      yield put( refreshAccountShells( [ shellToSync ], {
+      } ) )
+    } else {
+      console.log( 'Gifts generation failed' )
+      yield put( giftCreationSuccess( false ) )
     }
-    yield put( refreshAccountShells( [ shellToSync ], {
-    } ) )
-  } else {
-    console.log( 'Gifts generation failed' )
+
+  } catch( err ){
     yield put( giftCreationSuccess( false ) )
+    Toast( 'Transaction failed due to dust limit. Please increase the gift amount and try' )
   }
 }
 

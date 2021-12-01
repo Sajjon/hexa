@@ -77,8 +77,6 @@ const CreateGift = ( { navigation } ) => {
   const [ inputStyle, setInputStyle ] = useState( styles.inputBox )
   const [ amount, setAmount ] = useState( '' )
   const [ showKeyboard, setKeyboard ] = useState( false )
-  const [ giftsNumber, setGiftsNumber ] = useState( false )
-  const [ amountKeyBoard, setAmountKeyBoard ] = useState( false )
   const [ numbersOfGift, setNumbersOfGift ] = useState( 1 )
   const [ timeLock, setTimeLock ] = useState( 1 )
   const [ limitedValidity, setLimitedValidity ] = useState( 1 )
@@ -118,7 +116,7 @@ const CreateGift = ( { navigation } ) => {
         setGiftModal( true )
         setInitGiftCreation( false )
         setShowLoader( false )
-        dispatch( giftCreationSuccess( false ) )
+        dispatch( giftCreationSuccess( null ) )
       }
     }
   }, [ accountsState.selectedGiftId, initGiftCreation, giftCreationStatus ] )
@@ -127,7 +125,11 @@ const CreateGift = ( { navigation } ) => {
     setInitGiftCreation( false )
     setShowLoader( false )
     if( giftCreationStatus ){
-      dispatch( giftCreationSuccess( false ) )
+      dispatch( giftCreationSuccess( null ) )
+    } else if( giftCreationStatus === false ){
+      // failed to create gift
+      setShowLoader( false )
+      dispatch( giftCreationSuccess( null ) )
     }
   }, [ giftCreationStatus ] )
 
@@ -141,11 +143,12 @@ const CreateGift = ( { navigation } ) => {
 
   const renderButton = ( text, condn ) => {
     const availableToSpend = selectedAccount && selectedAccount.primarySubAccount?.balances?.confirmed ? selectedAccount.primarySubAccount?.balances?.confirmed : 0
-    const actualAmount = ( ( availableToSpend / SATOSHIS_IN_BTC ) *
-    accountsState.exchangeRates[ currencyCode ].last
-    ).toFixed( 2 )
+    const lowestGiftValue = includeFees? averageLowTxFee + 1000: 1000
 
-    const isDisabled = availableToSpend <= 0 || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend || ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) ) )
+    const isDisabled = currentSatsAmountFormValue < 10 || availableToSpend <= 0
+    || ( parseInt( amount ? amount :  '0' ) <= 0 || parseInt( amount ? amount :  '0' ) > availableToSpend
+    //|| ( !prefersBitcoin && parseInt( amount ? amount :  '0' ) >  parseInt( actualAmount ) )
+    )
     return(
       <TouchableOpacity
         disabled={isDisabled}
@@ -200,28 +203,13 @@ const CreateGift = ( { navigation } ) => {
   }
 
   function onPressNumber( text ) {
-    if( amountKeyBoard ) {
-      let tmpPasscode = amount
-      if ( amount.length < 4 ) {
-        if ( text != 'x' ) {
-          tmpPasscode += text
-          if( amountKeyBoard ) setAmount( tmpPasscode )
-        }
-      }
-      if ( amount && text == 'x' ) {
-        setAmount( amount.slice( 0, -1 ) )
-      }
-    } else if( giftsNumber ) {
-      let tmpPasscode = numbersOfGift
-      if ( numbersOfGift.length < 4 ) {
-        if ( text != 'x' ) {
-          tmpPasscode += text
-          setNumbersOfGift( tmpPasscode )
-        }
-      }
-      if ( numbersOfGift && text == 'x' ) {
-        setNumbersOfGift( numbersOfGift.slice( 0, -1 ) )
-      }
+    let tmpPasscode = amount
+    if ( text != 'x' ) {
+      tmpPasscode += text
+      setAmount( tmpPasscode )
+    }
+    if ( amount && text == 'x' ) {
+      setAmount( amount.slice( 0, -1 ) )
     }
   }
 
@@ -589,7 +577,7 @@ const CreateGift = ( { navigation } ) => {
               />
             </View>
           </TouchableOpacity>
-          <ToggleContainer />
+          {/* <ToggleContainer /> */}
         </View>
         <View style={{
           flexDirection: 'row', alignItems: 'center',
@@ -617,7 +605,7 @@ const CreateGift = ( { navigation } ) => {
                 }} source={require( '../../assets/images/icons/icon_settings_blue.png' )} />
               </TouchableOpacity>
             </View>
-            <View style={{
+            {/* <View style={{
               flexDirection: 'row', alignItems: 'center',
             }}>
               <Text style={[ CommonStyles.subHeaderTitles, {
@@ -625,7 +613,7 @@ const CreateGift = ( { navigation } ) => {
               } ]} >
                 {'View and manage created Gifts'}
               </Text>
-            </View>
+            </View> */}
 
 
           </View>
@@ -654,15 +642,15 @@ const CreateGift = ( { navigation } ) => {
             }} />
             <Text style={[ styles.modalInputBox, {
               color: amount !== '' ? Colors.textColorGrey : Colors.gray1,
-            } ]} onPress={() => {setKeyboard( true ); setAmountKeyBoard( true ); setGiftsNumber( false )}}>{amount}
-              {!showKeyboard && !amountKeyBoard &&
+            } ]} onPress={() => setKeyboard( true )}>{UsNumberFormat( amount ) === '0' ? '' :UsNumberFormat( amount ) }
+              {!showKeyboard &&
               <Text style={{
                 fontSize: RFValue( 12 ),
               }}>
                 {`Enter amount in ${prefersBitcoin ? 'sats' : `${fiatCurrencyCode}`}`}
               </Text>
               }
-              {( showKeyboard && amountKeyBoard ) && <Text style={{
+              {( showKeyboard ) && <Text style={{
                 color: Colors.lightBlue, fontSize: RFValue( 18 ),
               }}>|</Text>}
             </Text>
@@ -739,6 +727,17 @@ const CreateGift = ( { navigation } ) => {
           flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 6 )
         }}>
           {renderButton( 'Create Gift',  'Create Gift' )}
+        </View>
+        <View style={{
+          marginLeft: wp( '5%' ),
+          marginTop: wp( '3%' )
+        }}>
+          <Text style={{
+            color: Colors.textColorGrey,
+            fontSize: RFValue( 13 ),
+            fontFamily: Fonts.FiraSansRegular,
+            marginHorizontal: wp( 3 )
+          }}>{`Note: ${includeFees ? `Minimum gift value:  ${averageLowTxFee+ 1000} sats`: 'Minimum gift value: 1000 sats'}`}</Text>
         </View>
         {showKeyboard &&
         <View style={{

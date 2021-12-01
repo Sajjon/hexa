@@ -72,7 +72,8 @@ const ManageGifts = ( { navigation } ) => {
   const dispatch = useDispatch()
 
   const prefersBitcoin = useMemo( () => {
-    return currencyKind === CurrencyKind.BITCOIN
+    //return currencyKind === CurrencyKind.BITCOIN
+    return true
   }, [ currencyKind ] )
 
   useEffect( () => {
@@ -135,13 +136,13 @@ const ManageGifts = ( { navigation } ) => {
     if( selectedGift.type === GiftType.SENT ){
       if( selectedGift.status === GiftStatus.CREATED || selectedGift.status === GiftStatus.RECLAIMED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     } else if ( selectedGift.type === GiftType.RECEIVED ) {
       if( selectedGift.status === GiftStatus.ACCEPTED ){
         navigation.navigate( 'GiftDetails', {
-          title, walletName, gift: selectedGift, avatar: false
+          title, walletName, gift: selectedGift, avatar: false, setActiveTab: buttonPress
         } )
       }
     }
@@ -271,7 +272,10 @@ const ManageGifts = ( { navigation } ) => {
         </View>
         <ScrollView
           style={{
-            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 )
+            paddingHorizontal: wp( 3 ), paddingTop: hp( 2 ),
+          }}
+          contentContainerStyle={{
+            justifyContent: 'space-evenly', width: '100%'
           }}
           horizontal>
           {
@@ -280,6 +284,7 @@ const ManageGifts = ( { navigation } ) => {
               return (
                 <TouchableOpacity
                   key={item}
+                  activeOpacity={0.6}
                   style={[ styles.buttonNavigator, {
                     backgroundColor: active === item ? Colors.lightBlue : Colors.borderColor,
                     shadowColor: active === item ? '#77B9EB96' : Colors.white,
@@ -320,7 +325,9 @@ const ManageGifts = ( { navigation } ) => {
         }
         { active === GiftStatus.CREATED &&
         <TouchableOpacity
-          onPress={() => navigation.navigate( 'CreateGift' )}
+          onPress={() => navigation.navigate( 'CreateGift', {
+            setActiveTab: buttonPress
+          } )}
           style={{
             flexDirection: 'row', alignItems: 'center', marginHorizontal: wp( 9 ),
             marginVertical: hp( 1 )
@@ -402,7 +409,7 @@ const ManageGifts = ( { navigation } ) => {
                       key={index}
                       onPress={() => {
                         navigation.navigate( 'GiftDetails', {
-                          title, walletName, gift: item, avatar: true, contactDetails
+                          title, walletName, gift: item, avatar: true, contactDetails, setActiveTab: buttonPress
                         } )
                       }
                       }
@@ -530,7 +537,7 @@ const styles = StyleSheet.create( {
     fontFamily: Fonts.FiraSansMedium
   },
   buttonNavigator: {
-    width: wp( '20%' ),
+    //width: wp( '20%' ),
     height: 64,
     marginRight: wp( 2 ),
     marginLeft: wp( 1 ),
@@ -538,6 +545,7 @@ const styles = StyleSheet.create( {
     alignItems: 'center',
     backgroundColor: Colors.borderColor,
     borderRadius: wp( 3 ),
+    flex: 1,
   },
   modalTitleText: {
     color: Colors.blue,

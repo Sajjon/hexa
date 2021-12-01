@@ -51,8 +51,8 @@ const GiftDetails = ( { navigation } ) => {
   const [ isDisabled, setIsDisabled ] = useState( false )
   const [ dropdownBoxValue, setDropdownBoxValue ] = useState( {
     id: GiftThemeId.ONE,
-    title: 'Gift sats',
-    subText: 'Here\'s some sats for your stack',
+    title: 'Gift Sats',
+    subText: 'Something that appreciates with time',
     avatar: <GiftCard />,
     color: Colors.darkBlue
   } )
@@ -83,6 +83,7 @@ const GiftDetails = ( { navigation } ) => {
               showDone:true,
               themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
               senderName: name,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           } else {
             navigation.replace( 'SendGift', {
@@ -91,7 +92,8 @@ const GiftDetails = ( { navigation } ) => {
               note,
               contact,
               senderName: name,
-              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE
+              themeId: dropdownBoxValue?.id ?? GiftThemeId.ONE,
+              setActiveTab: navigation.state.params.setActiveTab
             } )
           }
 
