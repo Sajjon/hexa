@@ -639,7 +639,7 @@ class FriendsAndFamilyScreen extends React.Component<
                     marginTop: 3,
                     width: '85%',
                   }}>
-                    {this.strings[ 'giftSubText' ]}
+                    {this.strings[ 'giftSubTextF&F' ]}
                   </Text>
 
                 </View>
