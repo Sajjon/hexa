@@ -124,9 +124,11 @@ const TrustedContactHistoryKeeper = ( props ) => {
   const createChannelAssetsStatus = useSelector( ( state ) => state.bhr.loading.createChannelAssetsStatus )
   const isErrorSendingFailed = useSelector( ( state ) => state.bhr.errorSending )
   const channelAssets: ChannelAssets = useSelector( ( state ) => state.bhr.channelAssets )
-  const s3 = dbManager.getBHR()
-  const MetaShares: MetaShare[] = [ ...s3.metaSharesKeeper ]
-  const OldMetaShares: MetaShare[] = [ ...s3.oldMetaSharesKeeper ]
+  const metaSharesKeeper = useSelector( ( state ) => state.bhr.metaSharesKeeper )
+  const oldMetaSharesKeeper = useSelector( ( state ) => state.bhr.oldMetaSharesKeeper )
+
+  const MetaShares: MetaShare[] = [ ...metaSharesKeeper ]
+  const OldMetaShares: MetaShare[] = [ ...oldMetaSharesKeeper ]
   const keeperInfo = useSelector( ( state ) => state.bhr.keeperInfo )
   const levelData: LevelData[] = useSelector( ( state ) => state.bhr.levelData )
   const currentLevel = useSelector( ( state ) => state.bhr.currentLevel )
@@ -549,7 +551,7 @@ const TrustedContactHistoryKeeper = ( props ) => {
         name: Contact && Contact.displayedName ? Contact.displayedName : Contact && Contact.name ? Contact && Contact.name : '',
         type: shareType,
         scheme: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? MetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ? OldMetaShares.find( value=>value.shareId==selectedKeeper.shareId ).meta.scheme : '2of3',
-        currentLevel: currentLevel,
+        currentLevel: currentLevel == 0 ? 1 : currentLevel,
         createdAt: moment( new Date() ).valueOf(),
         sharePosition: MetaShares.find( value=>value.shareId==selectedKeeper.shareId ) ?
           MetaShares.findIndex( value=>value.shareId==selectedKeeper.shareId ) :
