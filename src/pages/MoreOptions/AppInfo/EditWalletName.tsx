@@ -160,7 +160,7 @@ export default function EditWalletName( props ) {
             editable={isEditable}
             autoCapitalize="none"
             onSubmitEditing={() =>
-              ( confirmAnswerTextInput as any ).current.focus()
+              ( confirmAnswerTextInput as any ).current
             }
             keyboardType={
               Platform.OS == 'ios'
