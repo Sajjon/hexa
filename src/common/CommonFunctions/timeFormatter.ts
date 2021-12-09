@@ -19,15 +19,15 @@ export const timeFormatter=( current, previous ) =>{
     }
 
     else if ( elapsed < msPerDay ) {
-      return Math.floor( elapsed/msPerHour ) + ' hours ago'
+      return Math.floor( elapsed/msPerHour ) + `${Math.floor( elapsed/msPerHour ) === 1 ? ' hour ago' : ' hours ago'}`
     }
 
     else if ( elapsed < msPerMonth ) {
-      return 'approximately ' + Math.floor( elapsed/msPerDay ) + ' days ago'
+      return 'approximately ' + Math.floor( elapsed/msPerDay ) + `${Math.floor( elapsed/msPerDay ) === 1 ? ' day ago' : ' days ago'}`
     }
 
     else if ( elapsed < msPerYear ) {
-      return 'approximately ' + Math.floor( elapsed/msPerMonth ) + ' months ago'
+      return 'approximately ' + Math.floor( elapsed/msPerMonth ) + `${Math.floor( elapsed/msPerMonth ) === 1 ? ' month ago' : ' months ago'}`
     }
 
     else {
