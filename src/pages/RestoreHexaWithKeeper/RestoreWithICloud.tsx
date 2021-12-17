@@ -355,16 +355,10 @@ class RestoreWithICloud extends Component<
     }
 
     if ( prevProps.downloadedBackupData.length == 0 && prevProps.downloadedBackupData != this.props.downloadedBackupData && this.props.downloadedBackupData.length == 1 ) {
-      console.log( 'CHANGE', this.props.keeperInfo )
-      console.log( 'this.props.downloadedBackupData[ 0 ].backupData.keeperInfo[ this.props.downloadedBackupData[ 0 ].backupData.keeperInfo.length - 1 ]', this.props.downloadedBackupData[ 0 ].backupData.keeperInfo[ this.props.downloadedBackupData[ 0 ].backupData.keeperInfo.length - 1 ] )
       if ( this.props.downloadedBackupData[ 0 ].backupData.keeperInfo[ this.props.downloadedBackupData[ 0 ].backupData.keeperInfo.length - 1 ].scheme == '1of1' ) {
         this.updateList(); console.log( 'this.updateList();' )
       } else this.setKeeperInfoList( 0, this.props.downloadedBackupData[ 0 ].backupData.keeperInfo )
     }
-
-    // if( prevState.isWithoutCloud != this.state.isWithoutCloud ){
-    //   this.props.restoreWithoutUsingIcloud( this.props.downloadedBackupData[ 0 ].backupData, this.state.answer )
-    // }
 
     // if ( prevProps.s3Service != this.props.s3Service && this.props.s3Service.levelhealth ) {
     //   this.props.setupHealth( this.state.currentLevel )
@@ -392,8 +386,6 @@ class RestoreWithICloud extends Component<
           securityQuestionModal: true,
           question: downloadedBackupData[ 0 ].backupData.primaryMnemonicShard.meta.question
         } )
-      } else {
-        this.setKeeperInfoList( downloadedBackupData[ 0 ].backupData.keeperInfo[ 1 ].currentLevel, downloadedBackupData[ 0 ].backupData.keeperInfo )
       }
     }
     updatedListData = [ ...listData ]
@@ -640,6 +632,8 @@ class RestoreWithICloud extends Component<
     this.setState( {
       contactList: list,
       listData: listDataArray
+    }, ()=>{
+      this.updateList()
     } )
     this.props.putKeeperInfo( KeeperInfo )
   }
@@ -837,8 +831,7 @@ class RestoreWithICloud extends Component<
           this.setState( {
             restoreModal: false
           } )
-          navigation.navigate( 'WalletInitialization' )
-
+          // navigation.navigate( 'WalletInitialization' )
         }}
         hideShow={this.state.hideShow}
         walletsArray={this.state.walletsArray}
@@ -1242,7 +1235,10 @@ class RestoreWithICloud extends Component<
               this.setState( ( state ) => ( {
                 answer: answer
               } ) )
-              if( this.state.isWithoutCloud ) this.props.restoreWithoutUsingIcloud( this.props.downloadedBackupData[ 0 ].backupData, this.state.answer )
+              if( this.state.isWithoutCloud ) {
+                this.showLoaderModal()
+                this.props.restoreWithoutUsingIcloud( this.props.downloadedBackupData[ 0 ].backupData, this.state.answer )
+              }
               else this.decryptCloudJson()
             }}
           />
