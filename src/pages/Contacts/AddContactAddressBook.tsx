@@ -328,7 +328,7 @@ export default function AddContactAddressBook( props ) {
     const skippedContact = {
       id: uuid(),
     }
-    props.navigation.navigate( 'AddContactSendRequest', {
+    props.navigation.navigate( 'SendGift', {
       SelectedContact: [ skippedContact ],
       giftId: props.navigation.state.params?.giftId,
       headerText: strings.addContact,
@@ -336,6 +336,7 @@ export default function AddContactAddressBook( props ) {
       contactText:strings.adding,
       showDone:true,
       skipClicked: true,
+      props,
     } )
   }
 
