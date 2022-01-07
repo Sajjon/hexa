@@ -10,7 +10,8 @@ import {
   ScrollView,
   Platform,
   FlatList,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  Keyboard
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -610,12 +611,6 @@ const GiftDetails = ( { navigation } ) => {
     )
   }
 
-  const  handleKeyPress = ({ nativeEvent: { key: keyValue } }) => {
-    if(keyValue === 'Enter')
-    {
-      setDisableReturn(1);
-    }
-};
   return (
     <ScrollView
       contentContainerStyle={{
@@ -914,9 +909,8 @@ const GiftDetails = ( { navigation } ) => {
             placeholderTextColor={Colors.gray1}
             value={note}
             keyboardType={Platform.OS == 'ios' ? 'ascii-capable' : 'visible-password'}
-            // returnKeyType="done"
-            // returnKeyLabel="Done"
             enablesReturnKeyAutomatically = {true}
+            blurOnSubmit={true}
             autoCompleteType="off"
             autoCorrect={false}
             autoCapitalize="none"
@@ -925,7 +919,6 @@ const GiftDetails = ( { navigation } ) => {
             onChangeText={( text ) => {
               setNote( text )
             }}
-            onKeyPress={handleKeyPress}
           />
         </View>
 
