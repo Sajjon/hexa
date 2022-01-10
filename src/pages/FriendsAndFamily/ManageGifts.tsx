@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   Text,
   ScrollView,
-  FlatList, Image
+  FlatList, Image,RefreshControl
 } from 'react-native'
 import {
   widthPercentageToDP as wp,
@@ -51,7 +51,7 @@ const ManageGifts = ( { navigation } ) => {
   const strings = translations[ 'f&f' ]
   const common = translations[ 'common' ]
   const [ timer, setTimer ] = useState( true )
-  // const [ giftDetails, showGiftDetails ] = useState( false )
+  const [ giftRefresh, setGiftRefresh ] = useState( false )
   // const [ giftInfo, setGiftInfo ] = useState( null )
   const gifts = useSelector( ( state ) => idx( state, ( _ ) => _.accounts.gifts ) )
   const trustedContacts: Trusted_Contacts = useSelector(
@@ -214,7 +214,8 @@ const ManageGifts = ( { navigation } ) => {
       // height: '50%',
       flex: 1,
       backgroundColor: Colors.backgroundColor,
-    }}>
+    }}
+    >
       <ModalContainer onBackground={()=>setKnowMore( false )} visible={knowMore} closeBottomSheet={() => setKnowMore( false )}>
         <GiftKnowMore closeModal={() => setKnowMore( false )} />
       </ModalContainer>
@@ -343,6 +344,14 @@ const ManageGifts = ( { navigation } ) => {
 
         <FlatList
           // extraData={selectedDestinationID}
+          refreshControl={
+            <RefreshControl
+              refreshing={giftRefresh}
+              onRefresh={() => {
+                performRefreshOnPullDown()
+              }}
+            />
+          }
           style={{
             height: hp( giftsArr?.[ `${active}` ].length === 0 ? 0 : 69 ),
           }}
