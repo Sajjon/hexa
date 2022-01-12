@@ -440,7 +440,7 @@ const GiftDetails = ( { navigation } ) => {
             style={styles.deepLinkEncryptionTextContainer}
             >
               <Text style={styles.deepLinkEncryptionText}>
-                {deepLinkConfig?.encryptionKey}
+                {deepLinkConfig?.encryptionKey == undefined ? 'No Second Factor' : deepLinkConfig?.encryptionKey}
               </Text>
           </View>
         </View>
