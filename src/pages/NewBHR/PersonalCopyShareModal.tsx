@@ -155,8 +155,11 @@ export default function PersonalCopyShareModal( props ) {
                     if(item.type === 'Email'){              
                       onShare( personalCopyShareOptions[ 0 ], false )
                       setIsShared( true )
-                    }else if(item.type === 'Other' || 'Print'){
+                    }else if(item.type === 'Other'){
                       onShare( personalCopyShareOptions[ 0 ], true )
+                      setIsShared( true )
+                    }else if(item.type === 'Print' ){
+                      onShare( item, false )
                       setIsShared( true )
                     }
                   }
