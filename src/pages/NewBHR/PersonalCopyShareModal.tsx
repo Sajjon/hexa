@@ -151,11 +151,11 @@ export default function PersonalCopyShareModal( props ) {
               <AppBottomSheetTouchableWrapper
                 onPress={() => {
                   if( Platform.OS == 'ios' ) {
-                    // ( mailOptionsBottomSheet as any ).current.snapTo( 1 )
-                    if(item.type === 'Email'){
+                    //( mailOptionsBottomSheet as any ).current.snapTo( 1 )
+                    if(item.type === 'Email'){              
                       onShare( personalCopyShareOptions[ 0 ], false )
                       setIsShared( true )
-                    }else if(item.type === 'Other'){
+                    }else if(item.type === 'Other' || 'Print'){
                       onShare( personalCopyShareOptions[ 0 ], true )
                       setIsShared( true )
                     }
@@ -164,9 +164,6 @@ export default function PersonalCopyShareModal( props ) {
                     onShare( item, false )
                     setIsShared( true )
                   }
-
-                  // onShare( personalCopyShareOptions[ 0 ], true )
-                  // setIsShared( true )
                 }}
                 style={[
                   styles.listElements,
