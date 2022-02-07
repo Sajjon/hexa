@@ -1407,7 +1407,7 @@ export default function NewWalletQuestion( props: { navigation: { getParam: ( ar
                       handlePswdSubmit()
                     }}
                   />
-                  <Text style={styles.guessableText}>Easily Guessable</Text>
+                  {passwordScore == 0 && pswd.length !=0 && <Text style={styles.guessableText}>Easily Guessable</Text>}
                 </View>
                 {pswd.length !== 0 &&
                 <View style={styles.fieldsButtonContainer}>
