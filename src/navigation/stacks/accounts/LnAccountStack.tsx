@@ -17,6 +17,7 @@ import InvoiceDetailsScreen from '../../../pages/lightningAccount/screens/Invoic
 import TransactionDetailsScreen from '../../../pages/lightningAccount/screens/TransactionDetailsScreen'
 import SubAccountSettingsStack from './SubAccountSettingsStack'
 import PaymentDetailsScreen from '../../../pages/lightningAccount/screens/PaymentDetailsScreen'
+import NodeInfoScreen from '../../../pages/lightningAccount/screens/NodeInfoScreen'
 
 const AccountDetailsStack = createStackNavigator(
   {
@@ -146,6 +147,18 @@ const AccountDetailsStack = createStackNavigator(
 
     ChannelOpenScreen: {
       screen: ChannelOpenScreen,
+      navigationOptions: {
+        title: '',
+        headerStyle:{
+          elevation: 0,
+          shadowOpacity: 0,
+          borderBottomWidth: 0,
+        },
+      }
+    },
+
+    NodeInfoScreen: {
+      screen: NodeInfoScreen ,
       navigationOptions: {
         title: '',
         headerStyle:{

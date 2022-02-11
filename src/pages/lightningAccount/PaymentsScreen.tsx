@@ -1,5 +1,5 @@
 import React, { Component, } from 'react'
-import { View, StyleSheet, ActivityIndicator } from 'react-native'
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native'
 import { RFValue } from 'react-native-responsive-fontsize'
 import Colors from '../../common/Colors'
 import Fonts from '../../common/Fonts'
@@ -20,6 +20,9 @@ export default class PaymentListScreen extends Component {
   render() {
     return (
       <View style={styles.container}>
+                  <Text style={styles.header}>Payments</Text>
+
+
         {this.props.PaymentsStore.loading?
           <ActivityIndicator
             color={Colors.blue}
