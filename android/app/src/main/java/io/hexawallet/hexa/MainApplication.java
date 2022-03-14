@@ -40,7 +40,6 @@ import org.unimodules.adapters.react.ReactModuleRegistryProvider;
 import org.unimodules.core.interfaces.Package;
 import org.unimodules.core.interfaces.SingletonModule;
 import expo.modules.constants.ConstantsPackage;
-import expo.modules.permissions.PermissionsPackage;
 import expo.modules.filesystem.FileSystemPackage;
 
 // unimodule changes

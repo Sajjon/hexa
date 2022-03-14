@@ -14,7 +14,7 @@ import { DeepLinkEncryptionType } from '../../bitcoin/utilities/Interface'
 import { heightPercentageToDP as hp, widthPercentageToDP as wp } from 'react-native-responsive-screen'
 import CardWithRadioBtn from '../../components/CardWithRadioBtn'
 import idx from 'idx'
-import * as ExpoContacts from 'expo-contacts'
+// import * as ExpoContacts from 'expo-contacts'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import { translations } from '../../common/content/LocContext'
 

@@ -40,7 +40,7 @@ import TrustedContactsOperations from '../../bitcoin/utilities/TrustedContactsOp
 import ModalContainer from '../../components/home/ModalContainer'
 import BottomInfoBox from '../../components/BottomInfoBox'
 import Secure2FA from './Secure2FAModal'
-import * as ExpoContacts from 'expo-contacts'
+// import * as ExpoContacts from 'expo-contacts'
 import { LocalizationContext } from '../../common/content/LocContext'
 import { AccountsState } from '../../store/reducers/accounts'
 import ChangeSelection from '../FriendsAndFamily/ChangeSelection'
