@@ -56,6 +56,7 @@ import Header from './stacks/Header'
 import IconWithBadge from './stacks/security/IconWithBadge'
 import SmallNavHeaderBackButton from '../components/navigation/SmallNavHeaderBackButton'
 import defaultStackScreenNavigationOptions from './options/DefaultStackScreenNavigationOptions'
+import SecureEnclaveStack from './stacks/secure-enclave/SecureEnclaveStack'
 
 const SetupNavigator = createStackNavigator(
   {
@@ -138,6 +139,35 @@ const styles= StyleSheet.create( {
 
 const Bottomtab = createBottomTabNavigator(
   {
+    SecureEnclave: {
+      screen: SecureEnclaveStack,
+      navigationOptions: {
+        tabBarIcon: ( { focused } ) => {
+          return (
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              {focused ?
+                <HomeSVG/>
+                :
+                <HomeInactiveSVG/>
+              }
+
+              {focused ?
+                <View style={styles.activeStyle}/>
+                :
+                <View style={styles.inactiveStyle}/>
+              }
+              {/* <Svg height= '30'>
+                <Image source={focused ? require( '../assets/images/tabs/fnf_active.svg' ) : require( '../assets/images/tabs/home_inactive.png' )} style={{
+                  width: 30, height: 30, alignSelf: 'center'
+                }} />
+              </Svg> */}
+            </View>
+          )
+        }
+      }
+    },
     Home: {
       screen: HomeStack,
       navigationOptions: {
@@ -259,8 +289,10 @@ const Bottomtab = createBottomTabNavigator(
       navigationOptions: {
         tabBarIcon: ( { focused } ) => {
           return (
-            <View style={{marginTop: hp( '1.3%' )}}>
-            <IconWithBadge focused={focused} />
+            <View style={{
+              marginTop: hp( '1.3%' )
+            }}>
+              <IconWithBadge focused={focused} />
             </View>
           )
         }
